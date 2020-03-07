@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/_5sdp"
+    android:layout_marginRight="@dimen/_25sdp"
+    android:layout_marginLeft="@dimen/_25sdp"
+    android:layout_marginBottom="@dimen/_5sdp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="@dimen/_8sdp"
+    app:cardElevation="@dimen/_3sdp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_150sdp"
+                android:src="@mipmap/ic_launcher"
+                android:id="@+id/gambar"
+                android:scaleType="centerCrop"/>
+
+            <FrameLayout
+                android:id="@+id/popularityContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/_25sdp"
+                android:layout_alignParentRight="true"
+                android:layout_margin="10dp"
+                android:minWidth="@dimen/_25sdp"
+                android:background="@drawable/layout_rounded_corner">
+
+                <TextView
+                    android:id="@+id/popularityTextView"
+                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+                    android:drawableLeft="@drawable/ic_stars_white"
+                    android:layout_width="wrap_content"
+                    android:drawablePadding="5dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/white"
+                    tools:text="1"/>
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_alignBottom="@id/gambar"
+                android:background="@color/translucent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/_22sdp"
+                        android:text="name"
+                        android:textColor="#ffffff"
+                        android:textStyle="bold"
+                        android:textSize="@dimen/_18ssp"
+                        android:layout_marginBottom="@dimen/_8sdp"
+                        android:id="@+id/movieTitle"
+                        android:layout_marginLeft="@dimen/_15sdp"
+                        android:layout_marginRight="@dimen/_15sdp"/>
+
+
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/_1sdp"
+                        android:layout_marginLeft="@dimen/_15sdp"
+                        android:layout_marginRight="@dimen/_15sdp"
+                        android:background="#ffffff"/>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/movieTitle"
+                            android:text="Tanggal:"
+                            android:textColor="#ffffff"
+                            android:textSize="@dimen/_12ssp"
+                            android:layout_marginBottom="@dimen/_8sdp"
+                            android:layout_marginLeft="@dimen/_15sdp"
+                            android:layout_marginRight="@dimen/_5sdp"/>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/movieTitle"
+                            android:textColor="@color/colorAccent"
+                            android:text="Date"
+                            android:textStyle="bold"
+                            android:textSize="@dimen/_12ssp"
+                            android:id="@+id/date"
+                            android:layout_marginBottom="@dimen/_8sdp"
+                            android:layout_marginRight="@dimen/_15sdp"/>
+
+                    </LinearLayout>
+
+
+
+
+                </LinearLayout>
+            </FrameLayout>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

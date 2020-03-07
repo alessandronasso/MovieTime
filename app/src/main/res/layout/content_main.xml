@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/grey"
+    android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/ll1"
+            android:orientation="vertical">
+                <ImageView
+                    android:layout_width="@dimen/_80sdp"
+                    android:layout_height="@dimen/_30sdp"
+                    android:layout_marginTop="@dimen/_10sdp"
+                    android:background="@drawable/logoss"
+                    android:layout_gravity="center"/>
+
+        </LinearLayout>
+        <FrameLayout
+            android:layout_below="@+id/ll1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/fragment_container"
+            android:layout_above="@id/bottombar"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        </FrameLayout>
+
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:id="@+id/bottombar"
+            android:background="@color/dark"
+            android:orientation="vertical">
+                <com.google.android.material.bottomnavigation.BottomNavigationView
+                    android:id="@+id/BottomNavigation"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="@dimen/_5sdp"
+                    android:layout_gravity="bottom"
+                    app:itemBackground="@color/dark"
+                    android:foreground="?attr/selectableItemBackground"
+                    app:itemTextColor="@animator/bottom_nav_color"
+                    app:itemIconTint="@animator/bottom_nav_color"
+                    app:menu="@menu/bottombar_menu_4items"/>
+
+        </LinearLayout>
+
+
+
+
+</RelativeLayout>
