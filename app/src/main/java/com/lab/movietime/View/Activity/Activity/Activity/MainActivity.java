@@ -9,7 +9,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,7 +29,6 @@ import com.lab.movietime.Interface.ApiService;
 import com.lab.movietime.Model.MovieModel;
 import com.lab.movietime.Model.MovieResponse;
 import com.lab.movietime.R;
-import com.lab.movietime.Service.TimerService;
 import com.lab.movietime.View.Activity.Activity.Fragment.HomeFragment;
 import com.lab.movietime.View.Activity.Activity.Fragment.NetworkNotAvailable;
 import com.lab.movietime.View.Activity.Activity.Fragment.PlayingFragment;
@@ -38,8 +36,6 @@ import com.lab.movietime.View.Activity.Activity.Fragment.PopularFragment;
 import com.lab.movietime.values.Values;
 
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -87,25 +83,8 @@ public class MainActivity extends AppCompatActivity {
         }
         ////////////////
         setContentView(R.layout.activity_main);
-        if(isNetworkAvailable()){
-            loadFragment(new HomeFragment());
-        }else{
-            loadFragment(new NetworkNotAvailable());
-        }
-        final Handler handler = new Handler();
-        TimerTask timertask = new TimerTask() {
-            @Override
-            public void run() {
-                handler.post(new Runnable() {
-                    public void run() {
-                        startService(new Intent(MainActivity.this, TimerService.class));
-                    }
-                });
-            }
-        };
-        Timer timer = new Timer();
-        timer.schedule(timertask, 0, 10*SECONDS);
-
+        if(isNetworkAvailable()) loadFragment(new HomeFragment());
+        else loadFragment(new NetworkNotAvailable());
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.BottomNavigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 

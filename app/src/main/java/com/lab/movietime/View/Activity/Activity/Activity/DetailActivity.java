@@ -3,8 +3,6 @@ package com.lab.movietime.View.Activity.Activity.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -12,7 +10,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.GestureDetectorCompat;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
@@ -29,8 +26,7 @@ import butterknife.ButterKnife;
 
 import static com.lab.movietime.BuildConfig.URL_POSTER;
 
-public class DetailActivity extends AppCompatActivity implements GestureDetector.OnGestureListener,
-        GestureDetector.OnDoubleTapListener {
+public class DetailActivity extends AppCompatActivity {
     public static String EXTRA_ID = "extra_id";
     public static String EXTRA_TITLE = "extra_title";
     public static String EXTRA_OVERVIEW = "extra_overview";
@@ -41,9 +37,6 @@ public class DetailActivity extends AppCompatActivity implements GestureDetector
     public static String IS_FAVORITE = "is_favorite";
 
     private int currentApiVersion;
-    private GestureDetectorCompat mDetector;
-    private final int SWIPE_MIN_DISTANCE = 120;
-    private final int SWIPE_THRESHOLD_VELOCITY = 200;
 
 
     @BindView(R.id.movieTitle) TextView tvTitle;
@@ -71,14 +64,6 @@ public class DetailActivity extends AppCompatActivity implements GestureDetector
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detail_activity);
-
-        final View view = getWindow().getDecorView().getRootView();
-
-        mDetector = new GestureDetectorCompat(this,this);
-        // Set the gesture detector as the double tap
-        // listener.
-        mDetector.setOnDoubleTapListener(this);
-
         //////// HIDE NAVIGATION BAR ///////////
         currentApiVersion = android.os.Build.VERSION.SDK_INT;
         final int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -100,6 +85,7 @@ public class DetailActivity extends AppCompatActivity implements GestureDetector
                         }
                     });
         }
+
         ////////////////
 
 //        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
@@ -120,7 +106,7 @@ public class DetailActivity extends AppCompatActivity implements GestureDetector
         tvOverview.setText(overview);
         tvLanguage.setText(language);
         tvGenres.setText(genres);
-//        ab.setTitle(title);
+        //        ab.setTitle(title);
         SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd");
         Date date = null;
         try {
@@ -201,62 +187,6 @@ public class DetailActivity extends AppCompatActivity implements GestureDetector
 //            AppWidgetManager.getInstance(getApplication()).notifyAppWidgetViewDataChanged(id, R.id.stack_view);
 //        finish();
 //    }
-@Override
-public boolean onTouchEvent(MotionEvent event){
-    if (this.mDetector.onTouchEvent(event)) {
-        return true;
-    }
-    return super.onTouchEvent(event);
-}
-
-    @Override
-    public boolean onDown(MotionEvent event) {
-        return true;
-    }
-
-    @Override
-    public boolean onFling(MotionEvent event1, MotionEvent event2,
-                           float velocityX, float velocityY) {
-        if ((int)event2.getX() - (int)event1.getX() > SWIPE_MIN_DISTANCE &&     Math.abs(velocityX) >  SWIPE_THRESHOLD_VELOCITY) {
-            onBackPressed();
-            return true;
-        }
-        return true;
-    }
-
-    @Override
-    public void onLongPress(MotionEvent event) {
-    }
-
-    @Override
-    public boolean onScroll(MotionEvent event1, MotionEvent event2, float distanceX,
-                            float distanceY) {
-        return true;
-    }
-
-    @Override
-    public void onShowPress(MotionEvent event) {
-    }
-
-    @Override
-    public boolean onSingleTapUp(MotionEvent event) {
-        return true;
-    }
-
-    @Override
-    public boolean onDoubleTap(MotionEvent event) {
-        return true;
-    }
-
-    @Override
-    public boolean onDoubleTapEvent(MotionEvent event) {
-        return true;
-    }
-
-    @Override
-    public boolean onSingleTapConfirmed(MotionEvent event) {
-        return true;
-    }
 }
 
 
