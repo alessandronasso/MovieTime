@@ -93,7 +93,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_below="@+id/movieTitle"
-                            android:text="Tanggal:"
+                            android:text="Release:"
                             android:textColor="#ffffff"
                             android:textSize="@dimen/_8ssp"
                             android:layout_marginBottom="@dimen/_8sdp"

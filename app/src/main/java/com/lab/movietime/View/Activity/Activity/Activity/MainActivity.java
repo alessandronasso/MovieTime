@@ -1,15 +1,18 @@
 package com.lab.movietime.View.Activity.Activity.Activity;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -47,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private final int SECONDS = 30000;
     private int counter=0;
     public static int currentIndex;
+    private int currentApiVersion;
 
 
     private void loadFragment(Fragment fragment) {
@@ -60,6 +64,28 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //////// HIDE NAVIGATION BAR ///////////
+        currentApiVersion = android.os.Build.VERSION.SDK_INT;
+        final int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+        if(currentApiVersion >= Build.VERSION_CODES.KITKAT) {
+            getWindow().getDecorView().setSystemUiVisibility(flags);
+            final View decorView = getWindow().getDecorView();
+            decorView
+                    .setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
+                        @Override
+                        public void onSystemUiVisibilityChange(int visibility) {
+                            if((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
+                                decorView.setSystemUiVisibility(flags);
+                            }
+                        }
+                    });
+        }
+        ////////////////
         setContentView(R.layout.activity_main);
         if(isNetworkAvailable()){
             loadFragment(new HomeFragment());
@@ -85,6 +111,23 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    }
+
+    @SuppressLint("NewApi")
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus)
+    {
+        super.onWindowFocusChanged(hasFocus);
+        if(currentApiVersion >= Build.VERSION_CODES.KITKAT && hasFocus)
+        {
+            getWindow().getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+        }
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
