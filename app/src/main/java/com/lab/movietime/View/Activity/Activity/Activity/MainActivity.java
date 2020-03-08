@@ -52,15 +52,23 @@ public class MainActivity extends AppCompatActivity {
     private void loadFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager()
                 .beginTransaction();
-                transaction.replace(R.id.fragment_container, fragment);
-                transaction.addToBackStack(null);
-                transaction.commit();
+        transaction.replace(R.id.fragment_container, fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //////// HIDE NAVIGATION BAR ///////////
+        hideNavigationBar();
+        setContentView(R.layout.activity_main);
+        if(isNetworkAvailable()) loadFragment(new HomeFragment());
+        else loadFragment(new NetworkNotAvailable());
+        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.BottomNavigation);
+        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+    }
+
+    private void hideNavigationBar() {
         currentApiVersion = android.os.Build.VERSION.SDK_INT;
         final int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
@@ -81,15 +89,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
         }
-        ////////////////
-        setContentView(R.layout.activity_main);
-        if(isNetworkAvailable()) loadFragment(new HomeFragment());
-        else loadFragment(new NetworkNotAvailable());
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.BottomNavigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-
-
-
     }
 
     @SuppressLint("NewApi")
@@ -255,15 +254,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public boolean isNetworkAvailable() {
-       try{
-           ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-           NetworkInfo networkInfo = null;
-           if(manager != null){
-               networkInfo = manager.getActiveNetworkInfo();
-           }
-           return networkInfo != null && networkInfo.isConnected();
-       }catch (NullPointerException e) {
-           return false;
-       }
+        try{
+            ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = null;
+            if(manager != null){
+                networkInfo = manager.getActiveNetworkInfo();
+            }
+            return networkInfo != null && networkInfo.isConnected();
+        }catch (NullPointerException e) {
+            return false;
+        }
     }
 }

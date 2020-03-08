@@ -3,6 +3,7 @@ package com.lab.movietime.View.Activity.Activity.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -64,29 +65,8 @@ public class DetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detail_activity);
-        //////// HIDE NAVIGATION BAR ///////////
-        currentApiVersion = android.os.Build.VERSION.SDK_INT;
-        final int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-        if(currentApiVersion >= Build.VERSION_CODES.KITKAT) {
-            getWindow().getDecorView().setSystemUiVisibility(flags);
-            final View decorView = getWindow().getDecorView();
-            decorView
-                    .setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
-                        @Override
-                        public void onSystemUiVisibilityChange(int visibility) {
-                            if((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
-                                decorView.setSystemUiVisibility(flags);
-                            }
-                        }
-                    });
-        }
-
-        ////////////////
+        addGestures();
+        hideNavigationBar();
 
 //        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
 //        setSupportActionBar(myToolbar);
@@ -154,8 +134,65 @@ public class DetailActivity extends AppCompatActivity {
 //                }
 //            }
 //        });
+    }
 
+    private void addGestures () {
+        final int[] x1 = {0};
+        final int[] x2 = {0};
+        final int[] y1 = {0};
+        final int[] y2 = {0};
+        final int[] t1 = {0};
+        final int[] t2 = {0};
 
+        View myView = findViewById(R.id.detail_activity);
+        myView.setOnTouchListener(new View.OnTouchListener() {
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        x1[0] = (int)event.getX();
+                        y1[0] = (int) event.getY();
+                        t1[0] = (int) System.currentTimeMillis();
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                        x2[0] = (int) event.getX();
+                        y2[0] = (int) event.getY();
+                        t2[0] = (int) System.currentTimeMillis();
+
+                        if (x1[0] > x2[0]) {
+                            onBackPressed();
+                        } else if (x2[0] > x1[0]) {
+                            onBackPressed();
+                        }
+                        return true;
+                    case MotionEvent.ACTION_MOVE:
+                        return true;
+                }
+                return false;
+            }
+        });
+    }
+
+    private void hideNavigationBar() {
+        currentApiVersion = android.os.Build.VERSION.SDK_INT;
+        final int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+        if(currentApiVersion >= Build.VERSION_CODES.KITKAT) {
+            getWindow().getDecorView().setSystemUiVisibility(flags);
+            final View decorView = getWindow().getDecorView();
+            decorView
+                    .setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
+                        @Override
+                        public void onSystemUiVisibilityChange(int visibility) {
+                            if((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
+                                decorView.setSystemUiVisibility(flags);
+                            }
+                        }
+                    });
+        }
     }
 
 //    @Override

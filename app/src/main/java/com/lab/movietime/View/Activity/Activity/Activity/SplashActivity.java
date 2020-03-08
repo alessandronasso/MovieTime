@@ -17,7 +17,14 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //////// HIDE NAVIGATION BAR ///////////
+        hideNavigationBar();
+        setContentView(R.layout.splash_layout);
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    private void hideNavigationBar() {
         currentApiVersion = android.os.Build.VERSION.SDK_INT;
         final int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
@@ -38,10 +45,5 @@ public class SplashActivity extends AppCompatActivity {
                         }
                     });
         }
-        ////////////////
-        setContentView(R.layout.splash_layout);
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
-        finish();
     }
 }
