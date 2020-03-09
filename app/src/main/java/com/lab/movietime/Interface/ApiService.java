@@ -2,6 +2,7 @@ package com.lab.movietime.Interface;
 
 import com.lab.movietime.BuildConfig;
 import com.lab.movietime.Model.MovieResponse;
+import com.lab.movietime.Model.MovieTrailerResponse;
 
 
 import retrofit2.Call;
@@ -35,9 +36,12 @@ public interface ApiService {
     Call<MovieResponse> getUpcoming(
             @Query("api_key") String apiKey);
 
+    @GET("movie/{id}/videos")
+    Call<MovieTrailerResponse> getMovieTrailer(
+            @Path("id") int id,
+            @Query("api_key") String apiKey);
+
 //    @GET("movie/top_rated")
 //    Call<MovieResponse> getTopRatedMovies(@Query("api_key") String apiKey);
-//    @GET("movie/{id}")
-//    Call<MovieResponse> getMovieDetails(@Path("id") int id, @Query("api_key") String apiKey);
 
 }

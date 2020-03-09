@@ -38,6 +38,16 @@ public class MovieModel {
     @SerializedName("vote_average")
     private Double voteAverage;
 
+    public String getLinkTrailer() {
+        return linkTrailer;
+    }
+
+    public void setLinkTrailer(String linkTrailer) {
+        this.linkTrailer = linkTrailer;
+    }
+
+    private String linkTrailer;
+
     public MovieModel(String posterPath, boolean adult, String overview, String releaseDate, List<Integer> genreIds, Integer id,
                       String originalTitle, String originalLanguage, String title, String backdropPath, Double popularity,
                       Integer voteCount, Boolean video, Double voteAverage) {

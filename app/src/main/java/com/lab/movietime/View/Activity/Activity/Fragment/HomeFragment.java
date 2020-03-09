@@ -22,11 +22,14 @@ import com.lab.movietime.Interface.ApiBuilder;
 import com.lab.movietime.Interface.ApiService;
 import com.lab.movietime.Model.MovieModel;
 import com.lab.movietime.Model.MovieResponse;
+import com.lab.movietime.Model.MovieTrailer;
+import com.lab.movietime.Model.MovieTrailerResponse;
 import com.lab.movietime.R;
 import com.lab.movietime.View.Activity.Activity.Activity.DetailActivity;
 import com.lab.movietime.values.Values;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -44,6 +47,8 @@ public class HomeFragment extends Fragment {
     private TextView[] genre;
 
     private View view;
+
+    private HashMap<Integer, String> trailerMap = new HashMap<>();
 
     SwipeRefreshLayout mPullToRefresh;
 
@@ -95,25 +100,42 @@ public class HomeFragment extends Fragment {
 
     private void loadMovie() {
         Random rand = new Random(System.currentTimeMillis());
-        ArrayList<Integer> listGenres = new ArrayList<Integer>(GENRE.length);
-        for (int i : GENRE) listGenres.add(i);
-        int[] randomGenre = new int[3];
-        for (int j = 0; j<3; j++)  {
-            randomGenre[j] = rand.nextInt(GENRE.length-j);
-            genre[j].setText(identifyGenre(listGenres.get(randomGenre[j])));
-            listGenres.remove(listGenres.get(randomGenre[j]));
+        List<Integer> randomGenre = new ArrayList<>();
+        for (int j = 0; j < 3; j++)  {
+            int rand_tmp = rand.nextInt(GENRE.length);
+            while (randomGenre.contains(rand_tmp)) rand_tmp = rand.nextInt(GENRE.length);
+            randomGenre.add(rand_tmp);
+            genre[j].setText(identifyGenre(GENRE[rand_tmp]));
         }
         ApiService apiService = ApiBuilder.getClient(getContext()).create(ApiService.class);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL, false));
         recyclerView2.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL, false));
         recyclerView3.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL, false));
-        Call<MovieResponse> call = apiService.getDiscover(BuildConfig.API_KEY,Values.LANGUAGE,Values.SORT_BY[0], Values.ADULT, GENRE[randomGenre[0]], Values.PAGE[rand.nextInt(5)]);
-        Call<MovieResponse> call2 = apiService.getDiscover(BuildConfig.API_KEY,Values.LANGUAGE,Values.SORT_BY[0], Values.ADULT, GENRE[randomGenre[1]], Values.PAGE[rand.nextInt(5)]);
-        Call<MovieResponse> call3 = apiService.getDiscover(BuildConfig.API_KEY,Values.LANGUAGE,Values.SORT_BY[0], Values.ADULT, GENRE[randomGenre[2]], Values.PAGE[rand.nextInt(5)]);
+        Call<MovieResponse> call = apiService.getDiscover(BuildConfig.API_KEY,Values.LANGUAGE,Values.SORT_BY[0], Values.ADULT, GENRE[randomGenre.get(0)], Values.PAGE[rand.nextInt(5)]);
+        Call<MovieResponse> call2 = apiService.getDiscover(BuildConfig.API_KEY,Values.LANGUAGE,Values.SORT_BY[0], Values.ADULT, GENRE[randomGenre.get(1)], Values.PAGE[rand.nextInt(5)]);
+        Call<MovieResponse> call3 = apiService.getDiscover(BuildConfig.API_KEY,Values.LANGUAGE,Values.SORT_BY[0], Values.ADULT, GENRE[randomGenre.get(2)], Values.PAGE[rand.nextInt(5)]);
         call.enqueue(new Callback<MovieResponse>() {
             @Override
             public void onResponse(Call<MovieResponse>call, Response<MovieResponse> response) {
                 final List<MovieModel> movies = response.body().getResults();
+                for (int i = 0; i<movies.size(); i++) {
+                    Call<MovieTrailerResponse> callT = apiService.getMovieTrailer(movies.get(i).getId(), BuildConfig.API_KEY);
+                    callT.enqueue(new Callback<MovieTrailerResponse>() {
+                        @Override
+                        public void onResponse(Call<MovieTrailerResponse>call2, Response<MovieTrailerResponse> response2) {
+                            List<MovieTrailer> mt = response2.body().getResults();
+                            Integer mtID = response2.body().getId();
+                            if (mt.isEmpty()) trailerMap.put(mtID, "S0Q4gqBUs7c");
+                            else trailerMap.put(mtID, mt.get(0).getKey());
+                        }
+
+                        @Override
+                        public void onFailure(Call<MovieTrailerResponse>call2, Throwable t) {
+                            Log.i("TAGX","#Log "+t);
+                        }
+                    });
+
+                }
                 recyclerView.setAdapter(new MoviesAdapter(movies, R.layout.content_main, getContext()));
                 recyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
                     GestureDetector gestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
@@ -136,6 +158,7 @@ public class HomeFragment extends Fragment {
                             i.putExtra(DetailActivity.EXTRA_LANGUAGE, movies.get(position).getOriginalLanguage());
                             i.putExtra(DetailActivity.EXTRA_GENRES, movies.get(position).getGenre());
                             i.putExtra(DetailActivity.EXTRA_VOTE, movies.get(position).getVoteAverage());
+                            i.putExtra(DetailActivity.EXTRA_YTLINK, trailerMap.get(movies.get(position).getId()));
                             getContext().startActivity(i);
                         }
                         return false;
@@ -172,6 +195,24 @@ public class HomeFragment extends Fragment {
             @Override
             public void onResponse(Call<MovieResponse>call, Response<MovieResponse> response) {
                 final List<MovieModel> movies = response.body().getResults();
+                for (int i = 0; i<movies.size(); i++) {
+                    Call<MovieTrailerResponse> callT = apiService.getMovieTrailer(movies.get(i).getId(), BuildConfig.API_KEY);
+                    callT.enqueue(new Callback<MovieTrailerResponse>() {
+                        @Override
+                        public void onResponse(Call<MovieTrailerResponse>call2, Response<MovieTrailerResponse> response2) {
+                            List<MovieTrailer> mt = response2.body().getResults();
+                            Integer mtID = response2.body().getId();
+                            if (mt.isEmpty()) trailerMap.put(mtID, "S0Q4gqBUs7c");
+                            else trailerMap.put(mtID, mt.get(0).getKey());
+                        }
+
+                        @Override
+                        public void onFailure(Call<MovieTrailerResponse>call2, Throwable t) {
+                            Log.i("TAGX","#Log "+t);
+                        }
+                    });
+
+                }
                 recyclerView2.setAdapter(new MoviesAdapter(movies, R.layout.content_main, getContext()));
                 recyclerView2.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
                     GestureDetector gestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
@@ -194,6 +235,7 @@ public class HomeFragment extends Fragment {
                             i.putExtra(DetailActivity.EXTRA_LANGUAGE, movies.get(position).getOriginalLanguage());
                             i.putExtra(DetailActivity.EXTRA_GENRES, movies.get(position).getGenre());
                             i.putExtra(DetailActivity.EXTRA_VOTE, movies.get(position).getVoteAverage());
+                            i.putExtra(DetailActivity.EXTRA_YTLINK, trailerMap.get(movies.get(position).getId()));
                             getContext().startActivity(i);
                         }
                         return false;
@@ -233,6 +275,24 @@ public class HomeFragment extends Fragment {
             @Override
             public void onResponse(Call<MovieResponse>call, Response<MovieResponse> response) {
                 final List<MovieModel> movies = response.body().getResults();
+                for (int i = 0; i<movies.size(); i++) {
+                    Call<MovieTrailerResponse> callT = apiService.getMovieTrailer(movies.get(i).getId(), BuildConfig.API_KEY);
+                    callT.enqueue(new Callback<MovieTrailerResponse>() {
+                        @Override
+                        public void onResponse(Call<MovieTrailerResponse>call2, Response<MovieTrailerResponse> response2) {
+                            List<MovieTrailer> mt = response2.body().getResults();
+                            Integer mtID = response2.body().getId();
+                            if (mt.isEmpty()) trailerMap.put(mtID, "S0Q4gqBUs7c");
+                            else trailerMap.put(mtID, mt.get(0).getKey());
+                        }
+
+                        @Override
+                        public void onFailure(Call<MovieTrailerResponse>call2, Throwable t) {
+                            Log.i("TAGX","#Log "+t);
+                        }
+                    });
+
+                }
                 recyclerView3.setAdapter(new MoviesAdapter(movies, R.layout.content_main, getContext()));
                 recyclerView3.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
                     GestureDetector gestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
@@ -255,6 +315,7 @@ public class HomeFragment extends Fragment {
                             i.putExtra(DetailActivity.EXTRA_LANGUAGE, movies.get(position).getOriginalLanguage());
                             i.putExtra(DetailActivity.EXTRA_GENRES, movies.get(position).getGenre());
                             i.putExtra(DetailActivity.EXTRA_VOTE, movies.get(position).getVoteAverage());
+                            i.putExtra(DetailActivity.EXTRA_YTLINK, trailerMap.get(movies.get(position).getId()));
                             getContext().startActivity(i);
                         }
                         return false;
@@ -290,5 +351,4 @@ public class HomeFragment extends Fragment {
             }
         });
     }
-
 }

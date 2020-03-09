@@ -11,6 +11,7 @@ import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
@@ -18,6 +19,9 @@ import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.lab.movietime.R;
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer;
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener;
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -37,6 +41,7 @@ public class DetailActivity extends AppCompatActivity {
     public static String EXTRA_LANGUAGE = "extra_language";
     public static String EXTRA_GENRES = "extra_genres";
     public static String EXTRA_VOTE = "extra_vote";
+    public static String EXTRA_YTLINK = "extra_ytlink";
     public static String IS_FAVORITE = "is_favorite";
 
     private int currentApiVersion;
@@ -51,6 +56,7 @@ public class DetailActivity extends AppCompatActivity {
     @BindView(R.id.bookButton) Button btnBook;
     @BindView(R.id.progressBar) ProgressBar progressBar;
     @BindView(R.id.listitemrating) RatingBar ratingBar;
+    @BindView(R.id.youtube_player_view) YouTubePlayerView youTubePlayerView;
 
     Context context;
 //    private FavoriteHelper favoriteHelper;
@@ -71,12 +77,6 @@ public class DetailActivity extends AppCompatActivity {
         addGestures();
         hideNavigationBar();
 
-//        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
-//        setSupportActionBar(myToolbar);
-//        ActionBar ab = getSupportActionBar();
-//        assert ab != null;
-//        ab.setDisplayHomeAsUpEnabled(true);
-
         ButterKnife.bind(this);
         int id = getIntent().getIntExtra(EXTRA_ID, 0);
         String title = getIntent().getStringExtra(EXTRA_TITLE);
@@ -86,12 +86,25 @@ public class DetailActivity extends AppCompatActivity {
         String language = getIntent().getStringExtra(EXTRA_LANGUAGE);
         String genres = getIntent().getStringExtra(EXTRA_GENRES);
         double vote = getIntent().getDoubleExtra(EXTRA_VOTE, 0);
+
         tvTitle.setText(title);
         tvOverview.setText(overview);
         //tvLanguage.setText(language);
         tvGenres.setText(genres);
-        //        ab.setTitle(title);
+        //ab.setTitle(title);
         setRatingBar(vote);
+
+        youTubePlayerView = findViewById(R.id.youtube_player_view);
+        getLifecycle().addObserver(youTubePlayerView);
+
+        youTubePlayerView.addYouTubePlayerListener(new AbstractYouTubePlayerListener() {
+            @Override
+            public void onReady(@NonNull YouTubePlayer youTubePlayer) {
+                youTubePlayer.loadVideo(getIntent().getStringExtra(EXTRA_YTLINK), 0);
+                youTubePlayer.pause();
+            }
+        });
+
         SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd");
         Date date = null;
         try {
