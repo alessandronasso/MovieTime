@@ -5,6 +5,8 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.lab.movietime.values.Values.identifyGenre;
+
 public class MovieModel {
 
     @SerializedName("poster_path")
@@ -58,7 +60,7 @@ public class MovieModel {
 
 
     public Double getVoteAverage() {
-        return voteAverage;
+        return voteAverage/2;
     }
 
     public void setVoteAverage(Double voteAverage) {
@@ -103,6 +105,13 @@ public class MovieModel {
 
     public void setGenreIds(List<Integer> genreIds) {
         this.genreIds = genreIds;
+    }
+
+    public String getGenre () {
+        String tmp = "";
+        for (int i = 0; i<genreIds.size(); i++)
+            tmp += identifyGenre(genreIds.get(i))+", ";
+        return tmp.substring(0, tmp.length() - 2);
     }
 
     public Integer getId() {

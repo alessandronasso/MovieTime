@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -25,6 +26,7 @@ import com.lab.movietime.R;
 import com.lab.movietime.View.Activity.Activity.Activity.DetailActivity;
 import com.lab.movietime.values.Values;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -32,9 +34,16 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.lab.movietime.values.Values.GENRE;
+import static com.lab.movietime.values.Values.identifyGenre;
+
 public class HomeFragment extends Fragment {
 
     private RecyclerView recyclerView,recyclerView2, recyclerView3;
+
+    private TextView[] genre;
+
+    private View view;
 
     SwipeRefreshLayout mPullToRefresh;
 
@@ -58,7 +67,11 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.main_fragment, container, false);
+        view = inflater.inflate(R.layout.main_fragment, container, false);
+        genre = new TextView[3];
+        genre[0] = view.findViewById(R.id.MovieGenre);
+        genre[1] = view.findViewById(R.id.MovieGenre2);
+        genre[2] = view.findViewById(R.id.MovieGenre3);
         recyclerView = view.findViewById(R.id.rc_view);
         recyclerView2 = view.findViewById(R.id.rc_view2);
         recyclerView3 = view.findViewById(R.id.rc_view3);
@@ -82,14 +95,21 @@ public class HomeFragment extends Fragment {
 
     private void loadMovie() {
         Random rand = new Random(System.currentTimeMillis());
-
+        ArrayList<Integer> listGenres = new ArrayList<Integer>(GENRE.length);
+        for (int i : GENRE) listGenres.add(i);
+        int[] randomGenre = new int[3];
+        for (int j = 0; j<3; j++)  {
+            randomGenre[j] = rand.nextInt(GENRE.length-j);
+            genre[j].setText(identifyGenre(listGenres.get(randomGenre[j])));
+            listGenres.remove(listGenres.get(randomGenre[j]));
+        }
         ApiService apiService = ApiBuilder.getClient(getContext()).create(ApiService.class);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL, false));
         recyclerView2.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL, false));
         recyclerView3.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL, false));
-        Call<MovieResponse> call = apiService.getDiscover(BuildConfig.API_KEY,Values.LANGUAGE,Values.SORT_BY[0], Values.ADULT, Values.GENRE[1], Values.PAGE[rand.nextInt(5)]);
-        Call<MovieResponse> call2 = apiService.getDiscover(BuildConfig.API_KEY,Values.LANGUAGE,Values.SORT_BY[0], Values.ADULT, Values.GENRE[0], Values.PAGE[rand.nextInt(5)]);
-        Call<MovieResponse> call3 = apiService.getDiscover(BuildConfig.API_KEY,Values.LANGUAGE,Values.SORT_BY[0], Values.ADULT, Values.GENRE[2], Values.PAGE[rand.nextInt(5)]);
+        Call<MovieResponse> call = apiService.getDiscover(BuildConfig.API_KEY,Values.LANGUAGE,Values.SORT_BY[0], Values.ADULT, GENRE[randomGenre[0]], Values.PAGE[rand.nextInt(5)]);
+        Call<MovieResponse> call2 = apiService.getDiscover(BuildConfig.API_KEY,Values.LANGUAGE,Values.SORT_BY[0], Values.ADULT, GENRE[randomGenre[1]], Values.PAGE[rand.nextInt(5)]);
+        Call<MovieResponse> call3 = apiService.getDiscover(BuildConfig.API_KEY,Values.LANGUAGE,Values.SORT_BY[0], Values.ADULT, GENRE[randomGenre[2]], Values.PAGE[rand.nextInt(5)]);
         call.enqueue(new Callback<MovieResponse>() {
             @Override
             public void onResponse(Call<MovieResponse>call, Response<MovieResponse> response) {
@@ -114,13 +134,8 @@ public class HomeFragment extends Fragment {
                             i.putExtra(DetailActivity.EXTRA_TIME, movies.get(position).getReleaseDate());
                             i.putExtra(DetailActivity.EXTRA_POSTER, movies.get(position).getPosterPath());
                             i.putExtra(DetailActivity.EXTRA_LANGUAGE, movies.get(position).getOriginalLanguage());
-                            try{
-                                List<Integer> genr = movies.get(position).getGenreIds();
-                                i.putExtra(DetailActivity.EXTRA_GENRES, genr.toString());
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
-                            }
-
+                            i.putExtra(DetailActivity.EXTRA_GENRES, movies.get(position).getGenre());
+                            i.putExtra(DetailActivity.EXTRA_VOTE, movies.get(position).getVoteAverage());
                             getContext().startActivity(i);
                         }
                         return false;
@@ -177,13 +192,8 @@ public class HomeFragment extends Fragment {
                             i.putExtra(DetailActivity.EXTRA_TIME, movies.get(position).getReleaseDate());
                             i.putExtra(DetailActivity.EXTRA_POSTER, movies.get(position).getPosterPath());
                             i.putExtra(DetailActivity.EXTRA_LANGUAGE, movies.get(position).getOriginalLanguage());
-                            try{
-                                List<Integer> genr = movies.get(position).getGenreIds();
-                                i.putExtra(DetailActivity.EXTRA_GENRES, genr.toString());
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
-                            }
-
+                            i.putExtra(DetailActivity.EXTRA_GENRES, movies.get(position).getGenre());
+                            i.putExtra(DetailActivity.EXTRA_VOTE, movies.get(position).getVoteAverage());
                             getContext().startActivity(i);
                         }
                         return false;
@@ -243,13 +253,8 @@ public class HomeFragment extends Fragment {
                             i.putExtra(DetailActivity.EXTRA_TIME, movies.get(position).getReleaseDate());
                             i.putExtra(DetailActivity.EXTRA_POSTER, movies.get(position).getPosterPath());
                             i.putExtra(DetailActivity.EXTRA_LANGUAGE, movies.get(position).getOriginalLanguage());
-                            try{
-                                List<Integer> genr = movies.get(position).getGenreIds();
-                                i.putExtra(DetailActivity.EXTRA_GENRES, genr.toString());
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
-                            }
-
+                            i.putExtra(DetailActivity.EXTRA_GENRES, movies.get(position).getGenre());
+                            i.putExtra(DetailActivity.EXTRA_VOTE, movies.get(position).getVoteAverage());
                             getContext().startActivity(i);
                         }
                         return false;

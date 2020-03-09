@@ -24,10 +24,10 @@
                 android:textStyle="bold"
                 android:textColor="#ffffff"/>
             <TextView
+                android:id="@+id/MovieGenre"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_5sdp"
-                android:text="Action"
                 android:layout_marginLeft="@dimen/_10sdp"
                 android:layout_marginRight="@dimen/_10sdp"
                 android:textSize="@dimen/_12ssp"
@@ -56,11 +56,11 @@
                 android:background="#01d277"/>
 
             <TextView
+                android:id="@+id/MovieGenre2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_5sdp"
                 android:layout_gravity="center"
-                android:text="Fantasy"
                 android:layout_marginLeft="@dimen/_10sdp"
                 android:layout_marginRight="@dimen/_10sdp"
                 android:textSize="@dimen/_12ssp"
@@ -88,11 +88,11 @@
                 android:background="#01d277"/>
 
             <TextView
+                android:id="@+id/MovieGenre3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_5sdp"
                 android:layout_gravity="center"
-                android:text="Animation"
                 android:layout_marginLeft="@dimen/_10sdp"
                 android:layout_marginRight="@dimen/_10sdp"
                 android:textSize="@dimen/_12ssp"

@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -35,6 +36,7 @@ public class DetailActivity extends AppCompatActivity {
     public static String EXTRA_POSTER = "extra_poster";
     public static String EXTRA_LANGUAGE = "extra_language";
     public static String EXTRA_GENRES = "extra_genres";
+    public static String EXTRA_VOTE = "extra_vote";
     public static String IS_FAVORITE = "is_favorite";
 
     private int currentApiVersion;
@@ -42,12 +44,13 @@ public class DetailActivity extends AppCompatActivity {
 
     @BindView(R.id.movieTitle) TextView tvTitle;
     @BindView(R.id.overviewTextView) TextView tvOverview;
-    @BindView(R.id.durationTextView) TextView tvTime;
-    @BindView(R.id.languageTextView) TextView tvLanguage;
+    //@BindView(R.id.durationTextView) TextView tvTime;
+    //@BindView(R.id.languageTextView) TextView tvLanguage;
     @BindView(R.id.genresTextView) TextView tvGenres;
     @BindView(R.id.posterImg) ImageView imgPoster;
     @BindView(R.id.bookButton) Button btnBook;
     @BindView(R.id.progressBar) ProgressBar progressBar;
+    @BindView(R.id.listitemrating) RatingBar ratingBar;
 
     Context context;
 //    private FavoriteHelper favoriteHelper;
@@ -82,18 +85,20 @@ public class DetailActivity extends AppCompatActivity {
         String poster = getIntent().getStringExtra(EXTRA_POSTER);
         String language = getIntent().getStringExtra(EXTRA_LANGUAGE);
         String genres = getIntent().getStringExtra(EXTRA_GENRES);
+        double vote = getIntent().getDoubleExtra(EXTRA_VOTE, 0);
         tvTitle.setText(title);
         tvOverview.setText(overview);
-        tvLanguage.setText(language);
+        //tvLanguage.setText(language);
         tvGenres.setText(genres);
         //        ab.setTitle(title);
+        setRatingBar(vote);
         SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd");
         Date date = null;
         try {
             date = parser.parse(time);
             SimpleDateFormat formatter = new SimpleDateFormat("EEEE, dd MMM, yyyy");
             String formattedDate = formatter.format(date);
-            tvTime.setText(formattedDate);
+            //tvTime.setText(formattedDate);
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -193,6 +198,12 @@ public class DetailActivity extends AppCompatActivity {
                         }
                     });
         }
+    }
+
+    private void setRatingBar (double vote) {
+        ratingBar.setStepSize((float) 0.25);
+        ratingBar.setIsIndicator(true);
+        ratingBar.setRating((float) vote);
     }
 
 //    @Override

@@ -102,13 +102,8 @@ public class PopularFragment extends Fragment {
                             i.putExtra(DetailActivity.EXTRA_TIME, movies.get(position).getReleaseDate());
                             i.putExtra(DetailActivity.EXTRA_POSTER, movies.get(position).getPosterPath());
                             i.putExtra(DetailActivity.EXTRA_LANGUAGE, movies.get(position).getOriginalLanguage());
-                            try{
-                                List<Integer> genr = movies.get(position).getGenreIds();
-                                i.putExtra(DetailActivity.EXTRA_GENRES, genr.toString());
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
-                            }
-
+                            i.putExtra(DetailActivity.EXTRA_GENRES, movies.get(position).getGenre());
+                            i.putExtra(DetailActivity.EXTRA_VOTE, movies.get(position).getVoteAverage());
                             getContext().startActivity(i);
                         }
                         return false;
