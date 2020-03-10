@@ -1,6 +1,6 @@
 package com.lab.movietime.View.Activity.Activity.Activity;
 
-import android.content.Context;
+import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.MotionEvent;
@@ -18,6 +18,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.lab.movietime.Interface.DBHandler;
 import com.lab.movietime.R;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener;
@@ -53,20 +54,16 @@ public class DetailActivity extends AppCompatActivity {
     //@BindView(R.id.languageTextView) TextView tvLanguage;
     @BindView(R.id.genresTextView) TextView tvGenres;
     @BindView(R.id.posterImg) ImageView imgPoster;
-    @BindView(R.id.bookButton) Button btnBook;
+    @BindView(R.id.favButton) Button btnFav;
     @BindView(R.id.progressBar) ProgressBar progressBar;
     @BindView(R.id.listitemrating) RatingBar ratingBar;
     @BindView(R.id.youtube_player_view) YouTubePlayerView youTubePlayerView;
 
-    Context context;
-//    private FavoriteHelper favoriteHelper;
-//    private boolean isFavorite = false;
-//    private int favorite;
+    DBHandler db = new DBHandler(this);
 
 
     @Override
     public void onBackPressed() {
-
         super.onBackPressed();
     }
 
@@ -86,6 +83,19 @@ public class DetailActivity extends AppCompatActivity {
         String language = getIntent().getStringExtra(EXTRA_LANGUAGE);
         String genres = getIntent().getStringExtra(EXTRA_GENRES);
         double vote = getIntent().getDoubleExtra(EXTRA_VOTE, 0);
+        final boolean[] isFav = {false};
+
+        db.open();
+        Cursor c = db.getMovies();
+        if (c.moveToFirst()) {
+            do {
+                if (c.getString(0).equals(Integer.toString(id))) {
+                    isFav[0] = true;
+                    btnFav.setText("Remove from watchlist");
+                }
+            } while (c.moveToNext());
+        }
+        db.close();
 
         tvTitle.setText(title);
         tvOverview.setText(overview);
@@ -131,27 +141,22 @@ public class DetailActivity extends AppCompatActivity {
                 })
                 .into(imgPoster);
 
-//        favoriteHelper = new FavoriteHelper(this);
-//        favoriteHelper.open();
-
-//        favorite = getIntent().getIntExtra(IS_FAVORITE, 0);
-//        if (favorite == 1){
-//            isFavorite = true;
-//            btnFovorite.setText("Imposta come preferito");
-//        }
-
-//        btnFovorite.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (!isFavorite){
-//                    addFavorit();
-//                    Toast.makeText(DetailActivity.this, "Aggiunto ai preferiti!", Toast.LENGTH_LONG).show();
-//                }else {
-//                    deleteFavorite();
-//                    Toast.makeText(DetailActivity.this, "Rimosso dai preferiti!", Toast.LENGTH_LONG).show();
-//                }
-//            }
-//        });
+        btnFav.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                db.open();
+                if (!isFav[0]){
+                    db.insertMovie(Integer.toString(id), title);
+                    isFav[0] = true;
+                    btnFav.setText("Remove from watchlist");
+                } else {
+                    db.removeMovie(Integer.toString(id));
+                    isFav[0] = false;
+                    btnFav.setText("add to watchlist");
+                }
+                db.close();
+            }
+        });
     }
 
     private void addGestures () {
@@ -176,9 +181,7 @@ public class DetailActivity extends AppCompatActivity {
                         y2[0] = (int) event.getY();
                         t2[0] = (int) System.currentTimeMillis();
 
-                        if (x1[0] > x2[0]) {
-                            onBackPressed();
-                        } else if (x2[0] > x1[0]) {
+                        if (x2[0] > x1[0]) {
                             onBackPressed();
                         }
                         return true;
@@ -218,36 +221,6 @@ public class DetailActivity extends AppCompatActivity {
         ratingBar.setIsIndicator(true);
         ratingBar.setRating((float) vote);
     }
-
-//    @Override
-//    public boolean onNavigateUp(){
-//        finish();
-//        return true;
-//    }
-
-
-//    private void addFavorit(){
-//        Favorite favorites = new Favorite();
-//        favorites.setTitle(getIntent().getStringExtra(EXTRA_TITLE));
-//        favorites.setOverview(getIntent().getStringExtra(EXTRA_OVERVIEW));
-//        favorites.setRelease_date(getIntent().getStringExtra(EXTRA_TIME));
-//        favorites.setPoster(getIntent().getStringExtra(EXTRA_POSTER));
-//        favoriteHelper.insert(favorites);
-//
-//
-//        int widgetIDs[] = AppWidgetManager.getInstance(getApplication()).getAppWidgetIds(new ComponentName(getApplication(), ImageBannerWidget.class));
-//        for (int id : widgetIDs)
-//            AppWidgetManager.getInstance(getApplication()).notifyAppWidgetViewDataChanged(id, R.id.stack_view);
-//    }
-
-//    private void deleteFavorite(){
-//        favoriteHelper.delete(getIntent().getIntExtra(EXTRA_ID, 0));
-//
-//        int widgetIDs[] = AppWidgetManager.getInstance(getApplication()).getAppWidgetIds(new ComponentName(getApplication(), ImageBannerWidget.class));
-//        for (int id : widgetIDs)
-//            AppWidgetManager.getInstance(getApplication()).notifyAppWidgetViewDataChanged(id, R.id.stack_view);
-//        finish();
-//    }
 }
 
 

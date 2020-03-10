@@ -3,7 +3,6 @@ package com.lab.movietime.View.Activity.Activity.Fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -129,9 +128,9 @@ public class PopularFragment extends Fragment {
                         View child = rv.findChildViewUnder(e.getX(), e.getY());
                         if (child != null && gestureDetector.onTouchEvent(e)){
                             int position = rv.getChildAdapterPosition(child);
-                            Log.i("AH","POSITION: "+position+" MOVIE: "+movies.get(position).getTitle());
                             Intent i = new Intent(getContext(), DetailActivity.class);
                             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            i.putExtra(DetailActivity.EXTRA_ID, movies.get(position).getId());
                             i.putExtra(DetailActivity.EXTRA_TITLE, movies.get(position).getTitle());
                             i.putExtra(DetailActivity.EXTRA_OVERVIEW, movies.get(position).getOverview());
                             i.putExtra(DetailActivity.EXTRA_TIME, movies.get(position).getReleaseDate());

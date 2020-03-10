@@ -3,7 +3,6 @@ package com.lab.movietime.View.Activity.Activity.Fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -130,9 +129,7 @@ public class HomeFragment extends Fragment {
                         }
 
                         @Override
-                        public void onFailure(Call<MovieTrailerResponse>call2, Throwable t) {
-                            Log.i("TAGX","#Log "+t);
-                        }
+                        public void onFailure(Call<MovieTrailerResponse>call2, Throwable t) { }
                     });
 
                 }
@@ -151,6 +148,7 @@ public class HomeFragment extends Fragment {
                             int position = rv.getChildAdapterPosition(child);
                             Intent i = new Intent(getContext(), DetailActivity.class);
                             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            i.putExtra(DetailActivity.EXTRA_ID, movies.get(position).getId());
                             i.putExtra(DetailActivity.EXTRA_TITLE, movies.get(position).getTitle());
                             i.putExtra(DetailActivity.EXTRA_OVERVIEW, movies.get(position).getOverview());
                             i.putExtra(DetailActivity.EXTRA_TIME, movies.get(position).getReleaseDate());
@@ -165,31 +163,15 @@ public class HomeFragment extends Fragment {
                     }
 
                     @Override
-                    public void onTouchEvent(RecyclerView rv, MotionEvent e) {
-
-                    }
+                    public void onTouchEvent(RecyclerView rv, MotionEvent e) { }
 
                     @Override
-                    public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-
-                    }
+                    public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) { }
                 });
-                if (movies != null ){
-
-                    MovieModel firstMovie = movies.get(0);
-                    if(firstMovie != null) {
-                        Log.i("TAG","#Log "+firstMovie.getTitle());
-                    }
-                }
             }
 
             @Override
-            public void onFailure(Call<MovieResponse>call, Throwable t) {
-                // Log error here since request failed
-
-                Log.i("TAG","#Log "+t);
-
-            }
+            public void onFailure(Call<MovieResponse>call, Throwable t) { }
         });
         call2.enqueue(new Callback<MovieResponse>() {
             @Override
@@ -207,9 +189,7 @@ public class HomeFragment extends Fragment {
                         }
 
                         @Override
-                        public void onFailure(Call<MovieTrailerResponse>call2, Throwable t) {
-                            Log.i("TAGX","#Log "+t);
-                        }
+                        public void onFailure(Call<MovieTrailerResponse>call2, Throwable t) { }
                     });
 
                 }
@@ -228,6 +208,7 @@ public class HomeFragment extends Fragment {
                             int position = rv.getChildAdapterPosition(child);
                             Intent i = new Intent(getContext(), DetailActivity.class);
                             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            i.putExtra(DetailActivity.EXTRA_ID, movies.get(position).getId());
                             i.putExtra(DetailActivity.EXTRA_TITLE, movies.get(position).getTitle());
                             i.putExtra(DetailActivity.EXTRA_OVERVIEW, movies.get(position).getOverview());
                             i.putExtra(DetailActivity.EXTRA_TIME, movies.get(position).getReleaseDate());
@@ -242,33 +223,15 @@ public class HomeFragment extends Fragment {
                     }
 
                     @Override
-                    public void onTouchEvent(RecyclerView rv, MotionEvent e) {
-
-                    }
+                    public void onTouchEvent(RecyclerView rv, MotionEvent e) { }
 
                     @Override
-                    public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-
-                    }
+                    public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) { }
                 });
-                if (movies != null ){
-
-                    MovieModel firstMovie = movies.get(0);
-                    if(firstMovie != null) {
-                        Log.i("TAG","#Log "+firstMovie.getTitle());
-                    }
-                }
-
-
             }
 
             @Override
-            public void onFailure(Call<MovieResponse>call, Throwable t) {
-                // Log error here since request failed
-
-                Log.i("TAG","#Log "+t);
-
-            }
+            public void onFailure(Call<MovieResponse>call, Throwable t) { }
         });
 
         call3.enqueue(new Callback<MovieResponse>() {
@@ -287,9 +250,7 @@ public class HomeFragment extends Fragment {
                         }
 
                         @Override
-                        public void onFailure(Call<MovieTrailerResponse>call2, Throwable t) {
-                            Log.i("TAGX","#Log "+t);
-                        }
+                        public void onFailure(Call<MovieTrailerResponse>call2, Throwable t) { }
                     });
 
                 }
@@ -308,6 +269,7 @@ public class HomeFragment extends Fragment {
                             int position = rv.getChildAdapterPosition(child);
                             Intent i = new Intent(getContext(), DetailActivity.class);
                             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            i.putExtra(DetailActivity.EXTRA_ID, movies.get(position).getId());
                             i.putExtra(DetailActivity.EXTRA_TITLE, movies.get(position).getTitle());
                             i.putExtra(DetailActivity.EXTRA_OVERVIEW, movies.get(position).getOverview());
                             i.putExtra(DetailActivity.EXTRA_TIME, movies.get(position).getReleaseDate());
@@ -322,33 +284,15 @@ public class HomeFragment extends Fragment {
                     }
 
                     @Override
-                    public void onTouchEvent(RecyclerView rv, MotionEvent e) {
-
-                    }
+                    public void onTouchEvent(RecyclerView rv, MotionEvent e) { }
 
                     @Override
-                    public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-
-                    }
+                    public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) { }
                 });
-                if (movies != null ){
-
-                    MovieModel firstMovie = movies.get(0);
-                    if(firstMovie != null) {
-                        Log.i("TAG","#Log "+firstMovie.getTitle());
-                    }
-                }
-
-
             }
 
             @Override
-            public void onFailure(Call<MovieResponse>call, Throwable t) {
-                // Log error here since request failed
-
-                Log.i("TAG","#Log "+t);
-
-            }
+            public void onFailure(Call<MovieResponse>call, Throwable t) { }
         });
     }
 }

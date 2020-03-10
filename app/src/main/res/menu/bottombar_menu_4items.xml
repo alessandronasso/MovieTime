@@ -15,10 +15,10 @@
         android:id="@+id/bbn_item2"
         android:color="#141414"
         android:icon="@drawable/popular"
-        android:title="Popular" />
+        android:title="Search" />
     <item
         android:id="@+id/bbn_item3"
         android:color="#141414"
         android:icon="@drawable/playbutton"
-        android:title="Now Playing" />
+        android:title="Watchlist" />
 </menu>

@@ -112,7 +112,7 @@
                     android:transformPivotY="0dp" />
 
                 <Button
-                    android:id="@+id/bookButton"
+                    android:id="@+id/favButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textColor="#ffffff"

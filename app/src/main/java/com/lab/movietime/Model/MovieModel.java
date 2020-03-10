@@ -121,7 +121,8 @@ public class MovieModel {
         String tmp = "";
         for (int i = 0; i<genreIds.size(); i++)
             tmp += MAP_NAME.get(genreIds.get(i))+", ";
-        return tmp.substring(0, tmp.length() - 2);
+        if (tmp.equals("")) return "Unknow";
+        else return tmp.substring(0, tmp.length() - 2);
     }
 
     public Integer getId() {
