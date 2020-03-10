@@ -38,7 +38,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.lab.movietime.values.Values.GENRE;
-import static com.lab.movietime.values.Values.identifyGenre;
+import static com.lab.movietime.values.Values.MAP_NAME;
 
 public class HomeFragment extends Fragment {
 
@@ -105,7 +105,7 @@ public class HomeFragment extends Fragment {
             int rand_tmp = rand.nextInt(GENRE.length);
             while (randomGenre.contains(rand_tmp)) rand_tmp = rand.nextInt(GENRE.length);
             randomGenre.add(rand_tmp);
-            genre[j].setText(identifyGenre(GENRE[rand_tmp]));
+            genre[j].setText(MAP_NAME.get(GENRE[rand_tmp]));
         }
         ApiService apiService = ApiBuilder.getClient(getContext()).create(ApiService.class);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL, false));

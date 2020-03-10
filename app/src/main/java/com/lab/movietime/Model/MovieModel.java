@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.lab.movietime.values.Values.identifyGenre;
+import static com.lab.movietime.values.Values.MAP_NAME;
 
 public class MovieModel {
 
@@ -120,7 +120,7 @@ public class MovieModel {
     public String getGenre () {
         String tmp = "";
         for (int i = 0; i<genreIds.size(); i++)
-            tmp += identifyGenre(genreIds.get(i))+", ";
+            tmp += MAP_NAME.get(genreIds.get(i))+", ";
         return tmp.substring(0, tmp.length() - 2);
     }
 
