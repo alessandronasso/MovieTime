@@ -3,7 +3,6 @@ package com.lab.movietime.View.Activity.Activity.Activity;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -19,6 +18,7 @@ import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.lab.movietime.Interface.DBHandler;
+import com.lab.movietime.Listener.OnSwipeTouchListener;
 import com.lab.movietime.R;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener;
@@ -160,36 +160,21 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void addGestures () {
-        final int[] x1 = {0};
-        final int[] x2 = {0};
-        final int[] y1 = {0};
-        final int[] y2 = {0};
-        final int[] t1 = {0};
-        final int[] t2 = {0};
-
         View myView = findViewById(R.id.detail_activity);
-        myView.setOnTouchListener(new View.OnTouchListener() {
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        x1[0] = (int)event.getX();
-                        y1[0] = (int) event.getY();
-                        t1[0] = (int) System.currentTimeMillis();
-                        return true;
-                    case MotionEvent.ACTION_UP:
-                        x2[0] = (int) event.getX();
-                        y2[0] = (int) event.getY();
-                        t2[0] = (int) System.currentTimeMillis();
-
-                        if (x2[0] > x1[0]) {
-                            onBackPressed();
-                        }
-                        return true;
-                    case MotionEvent.ACTION_MOVE:
-                        return true;
-                }
-                return false;
+        myView.setOnTouchListener(new OnSwipeTouchListener(this) {
+            public void onSwipeTop() {
+                //Called when swiping top on this view
             }
+            public void onSwipeRight() {
+                onBackPressed();
+            }
+            public void onSwipeLeft() {
+                //Called when swiping left on this view
+            }
+            public void onSwipeBottom() {
+                onBackPressed();
+            }
+
         });
     }
 
