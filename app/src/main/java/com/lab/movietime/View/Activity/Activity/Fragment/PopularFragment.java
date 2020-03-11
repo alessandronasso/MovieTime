@@ -74,8 +74,10 @@ public class PopularFragment extends Fragment {
         mSearchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                searchMovie(mSearchField.getText().toString());
-                recyclerView.getAdapter().notifyDataSetChanged();
+                if (!mSearchField.getText().toString().equals("")) {
+                    searchMovie(mSearchField.getText().toString());
+                    recyclerView.getAdapter().notifyDataSetChanged();
+                }
             }
         });
 
