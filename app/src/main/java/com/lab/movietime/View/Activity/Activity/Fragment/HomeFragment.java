@@ -41,9 +41,13 @@ import static com.lab.movietime.values.Values.MAP_NAME;
 
 public class HomeFragment extends Fragment {
 
-    private RecyclerView recyclerView,recyclerView2, recyclerView3;
+    private int NUM_ROWS = 3;
 
-    private TextView[] genre;
+    private RecyclerView[] recyclerView = new RecyclerView[NUM_ROWS];
+
+    private Call[] call = new retrofit2.Call[NUM_ROWS];
+
+    private TextView[] genre = new TextView[NUM_ROWS];;
 
     private View view;
 
@@ -71,17 +75,16 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.main_fragment, container, false);
-        genre = new TextView[3];
         genre[0] = view.findViewById(R.id.MovieGenre);
         genre[1] = view.findViewById(R.id.MovieGenre2);
         genre[2] = view.findViewById(R.id.MovieGenre3);
-        recyclerView = view.findViewById(R.id.rc_view);
-        recyclerView2 = view.findViewById(R.id.rc_view2);
-        recyclerView3 = view.findViewById(R.id.rc_view3);
+        recyclerView[0] = view.findViewById(R.id.rc_view);
+        recyclerView[1] = view.findViewById(R.id.rc_view2);
+        recyclerView[2] = view.findViewById(R.id.rc_view3);
 
         mPullToRefresh = view.findViewById(R.id.swipe_list);
-        loadMovie();
 
+        loadMovie();
 
         mPullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -98,200 +101,80 @@ public class HomeFragment extends Fragment {
 
     private void loadMovie() {
         Random rand = new Random(System.currentTimeMillis());
+        ApiService apiService = ApiBuilder.getClient(getContext()).create(ApiService.class);
         List<Integer> randomGenre = new ArrayList<>();
-        for (int j = 0; j < 3; j++)  {
+        for (int j = 0; j < NUM_ROWS; j++) {
+            //GENERATING THE EXPLORE SECTION
             int rand_tmp = rand.nextInt(GENRE.length);
             while (randomGenre.contains(rand_tmp)) rand_tmp = rand.nextInt(GENRE.length);
             randomGenre.add(rand_tmp);
             genre[j].setText(MAP_NAME.get(GENRE[rand_tmp]));
+            //SETTING THE LAYOUT
+            recyclerView[j].setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL, false));
+            //SETTING THE CALL
+            call[j] = apiService.getDiscover(BuildConfig.API_KEY, Values.LANGUAGE, Values.SORT_BY[0], Values.ADULT, GENRE[randomGenre.get(j)], Values.PAGE[rand.nextInt(5)]);
         }
-        ApiService apiService = ApiBuilder.getClient(getContext()).create(ApiService.class);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL, false));
-        recyclerView2.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL, false));
-        recyclerView3.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL, false));
-        Call<MovieResponse> call = apiService.getDiscover(BuildConfig.API_KEY,Values.LANGUAGE,Values.SORT_BY[0], Values.ADULT, GENRE[randomGenre.get(0)], Values.PAGE[rand.nextInt(5)]);
-        Call<MovieResponse> call2 = apiService.getDiscover(BuildConfig.API_KEY,Values.LANGUAGE,Values.SORT_BY[0], Values.ADULT, GENRE[randomGenre.get(1)], Values.PAGE[rand.nextInt(5)]);
-        Call<MovieResponse> call3 = apiService.getDiscover(BuildConfig.API_KEY,Values.LANGUAGE,Values.SORT_BY[0], Values.ADULT, GENRE[randomGenre.get(2)], Values.PAGE[rand.nextInt(5)]);
-        call.enqueue(new Callback<MovieResponse>() {
-            @Override
-            public void onResponse(Call<MovieResponse>call, Response<MovieResponse> response) {
-                final List<MovieModel> movies = response.body().getResults();
-                for (int i = 0; i<movies.size(); i++) {
-                    Call<MovieTrailerResponse> callT = apiService.getMovieTrailer(movies.get(i).getId(), BuildConfig.API_KEY);
-                    callT.enqueue(new Callback<MovieTrailerResponse>() {
-                        @Override
-                        public void onResponse(Call<MovieTrailerResponse>call2, Response<MovieTrailerResponse> response2) {
-                            List<MovieTrailer> mt = response2.body().getResults();
-                            Integer mtID = response2.body().getId();
-                            if (mt.isEmpty()) trailerMap.put(mtID, "S0Q4gqBUs7c");
-                            else trailerMap.put(mtID, mt.get(0).getKey());
-                        }
 
-                        @Override
-                        public void onFailure(Call<MovieTrailerResponse>call2, Throwable t) { }
-                    });
-
-                }
-                recyclerView.setAdapter(new MoviesAdapter(movies, R.layout.content_main, getContext()));
-                recyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
-                    GestureDetector gestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
-                        public boolean onSingleTapUp(MotionEvent e){
-                            return true;
-                        }
-                    });
-
-                    @Override
-                    public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-                        View child = rv.findChildViewUnder(e.getX(), e.getY());
-                        if (child != null && gestureDetector.onTouchEvent(e)){
-                            int position = rv.getChildAdapterPosition(child);
-                            Intent i = new Intent(getContext(), DetailActivity.class);
-                            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            i.putExtra(DetailActivity.EXTRA_ID, movies.get(position).getId());
-                            i.putExtra(DetailActivity.EXTRA_TITLE, movies.get(position).getTitle());
-                            i.putExtra(DetailActivity.EXTRA_OVERVIEW, movies.get(position).getOverview());
-                            i.putExtra(DetailActivity.EXTRA_TIME, movies.get(position).getReleaseDate());
-                            i.putExtra(DetailActivity.EXTRA_POSTER, movies.get(position).getPosterPath());
-                            i.putExtra(DetailActivity.EXTRA_LANGUAGE, movies.get(position).getOriginalLanguage());
-                            i.putExtra(DetailActivity.EXTRA_GENRES, movies.get(position).getGenre());
-                            i.putExtra(DetailActivity.EXTRA_VOTE, movies.get(position).getVoteAverage());
-                            i.putExtra(DetailActivity.EXTRA_YTLINK, trailerMap.get(movies.get(position).getId()));
-                            getContext().startActivity(i);
-                        }
-                        return false;
+        for (int j = 0; j < NUM_ROWS; j++) {
+            int finalJ = j;
+            call[j].enqueue(new Callback<MovieResponse>() {
+                @Override
+                public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
+                    final List<MovieModel> movies = response.body().getResults();
+                    for (int i = 0; i < movies.size(); i++) {
+                        Call<MovieTrailerResponse> callT = apiService.getMovieTrailer(movies.get(i).getId(), BuildConfig.API_KEY);
+                        callT.enqueue(new Callback<MovieTrailerResponse>() {
+                            @Override
+                            public void onResponse(Call<MovieTrailerResponse> call2, Response<MovieTrailerResponse> response2) {
+                                List<MovieTrailer> mt = response2.body().getResults();
+                                Integer mtID = response2.body().getId();
+                                if (mt.isEmpty()) trailerMap.put(mtID, "S0Q4gqBUs7c");
+                                else trailerMap.put(mtID, mt.get(0).getKey());
+                            }
+                            @Override
+                            public void onFailure(Call<MovieTrailerResponse> call2, Throwable t) { }
+                        });
                     }
+                    recyclerView[finalJ].setAdapter(new MoviesAdapter(movies, R.layout.content_main, getContext()));
+                    recyclerView[finalJ].addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
+                        GestureDetector gestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
+                            public boolean onSingleTapUp(MotionEvent e) {
+                                return true;
+                            }
+                        });
 
-                    @Override
-                    public void onTouchEvent(RecyclerView rv, MotionEvent e) { }
-
-                    @Override
-                    public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) { }
-                });
-            }
-
-            @Override
-            public void onFailure(Call<MovieResponse>call, Throwable t) { }
-        });
-        call2.enqueue(new Callback<MovieResponse>() {
-            @Override
-            public void onResponse(Call<MovieResponse>call, Response<MovieResponse> response) {
-                final List<MovieModel> movies = response.body().getResults();
-                for (int i = 0; i<movies.size(); i++) {
-                    Call<MovieTrailerResponse> callT = apiService.getMovieTrailer(movies.get(i).getId(), BuildConfig.API_KEY);
-                    callT.enqueue(new Callback<MovieTrailerResponse>() {
                         @Override
-                        public void onResponse(Call<MovieTrailerResponse>call2, Response<MovieTrailerResponse> response2) {
-                            List<MovieTrailer> mt = response2.body().getResults();
-                            Integer mtID = response2.body().getId();
-                            if (mt.isEmpty()) trailerMap.put(mtID, "S0Q4gqBUs7c");
-                            else trailerMap.put(mtID, mt.get(0).getKey());
+                        public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+                            View child = rv.findChildViewUnder(e.getX(), e.getY());
+                            if (child != null && gestureDetector.onTouchEvent(e)) {
+                                int position = rv.getChildAdapterPosition(child);
+                                Intent i = new Intent(getContext(), DetailActivity.class);
+                                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                i.putExtra(DetailActivity.EXTRA_ID, movies.get(position).getId());
+                                i.putExtra(DetailActivity.EXTRA_TITLE, movies.get(position).getTitle());
+                                i.putExtra(DetailActivity.EXTRA_OVERVIEW, movies.get(position).getOverview());
+                                i.putExtra(DetailActivity.EXTRA_TIME, movies.get(position).getReleaseDate());
+                                i.putExtra(DetailActivity.EXTRA_POSTER, movies.get(position).getPosterPath());
+                                i.putExtra(DetailActivity.EXTRA_LANGUAGE, movies.get(position).getOriginalLanguage());
+                                i.putExtra(DetailActivity.EXTRA_GENRES, movies.get(position).getGenre());
+                                i.putExtra(DetailActivity.EXTRA_VOTE, movies.get(position).getVoteAverage());
+                                i.putExtra(DetailActivity.EXTRA_YTLINK, trailerMap.get(movies.get(position).getId()));
+                                getContext().startActivity(i);
+                            }
+                            return false;
                         }
 
                         @Override
-                        public void onFailure(Call<MovieTrailerResponse>call2, Throwable t) { }
-                    });
+                        public void onTouchEvent(RecyclerView rv, MotionEvent e) { }
 
+                        @Override
+                        public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) { }
+                    });
                 }
-                recyclerView2.setAdapter(new MoviesAdapter(movies, R.layout.content_main, getContext()));
-                recyclerView2.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
-                    GestureDetector gestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
-                        public boolean onSingleTapUp(MotionEvent e){
-                            return true;
-                        }
-                    });
 
-                    @Override
-                    public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-                        View child = rv.findChildViewUnder(e.getX(), e.getY());
-                        if (child != null && gestureDetector.onTouchEvent(e)){
-                            int position = rv.getChildAdapterPosition(child);
-                            Intent i = new Intent(getContext(), DetailActivity.class);
-                            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            i.putExtra(DetailActivity.EXTRA_ID, movies.get(position).getId());
-                            i.putExtra(DetailActivity.EXTRA_TITLE, movies.get(position).getTitle());
-                            i.putExtra(DetailActivity.EXTRA_OVERVIEW, movies.get(position).getOverview());
-                            i.putExtra(DetailActivity.EXTRA_TIME, movies.get(position).getReleaseDate());
-                            i.putExtra(DetailActivity.EXTRA_POSTER, movies.get(position).getPosterPath());
-                            i.putExtra(DetailActivity.EXTRA_LANGUAGE, movies.get(position).getOriginalLanguage());
-                            i.putExtra(DetailActivity.EXTRA_GENRES, movies.get(position).getGenre());
-                            i.putExtra(DetailActivity.EXTRA_VOTE, movies.get(position).getVoteAverage());
-                            i.putExtra(DetailActivity.EXTRA_YTLINK, trailerMap.get(movies.get(position).getId()));
-                            getContext().startActivity(i);
-                        }
-                        return false;
-                    }
-
-                    @Override
-                    public void onTouchEvent(RecyclerView rv, MotionEvent e) { }
-
-                    @Override
-                    public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) { }
-                });
-            }
-
-            @Override
-            public void onFailure(Call<MovieResponse>call, Throwable t) { }
-        });
-
-        call3.enqueue(new Callback<MovieResponse>() {
-            @Override
-            public void onResponse(Call<MovieResponse>call, Response<MovieResponse> response) {
-                final List<MovieModel> movies = response.body().getResults();
-                for (int i = 0; i<movies.size(); i++) {
-                    Call<MovieTrailerResponse> callT = apiService.getMovieTrailer(movies.get(i).getId(), BuildConfig.API_KEY);
-                    callT.enqueue(new Callback<MovieTrailerResponse>() {
-                        @Override
-                        public void onResponse(Call<MovieTrailerResponse>call2, Response<MovieTrailerResponse> response2) {
-                            List<MovieTrailer> mt = response2.body().getResults();
-                            Integer mtID = response2.body().getId();
-                            if (mt.isEmpty()) trailerMap.put(mtID, "S0Q4gqBUs7c");
-                            else trailerMap.put(mtID, mt.get(0).getKey());
-                        }
-
-                        @Override
-                        public void onFailure(Call<MovieTrailerResponse>call2, Throwable t) { }
-                    });
-
-                }
-                recyclerView3.setAdapter(new MoviesAdapter(movies, R.layout.content_main, getContext()));
-                recyclerView3.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
-                    GestureDetector gestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
-                        public boolean onSingleTapUp(MotionEvent e){
-                            return true;
-                        }
-                    });
-
-                    @Override
-                    public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-                        View child = rv.findChildViewUnder(e.getX(), e.getY());
-                        if (child != null && gestureDetector.onTouchEvent(e)){
-                            int position = rv.getChildAdapterPosition(child);
-                            Intent i = new Intent(getContext(), DetailActivity.class);
-                            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            i.putExtra(DetailActivity.EXTRA_ID, movies.get(position).getId());
-                            i.putExtra(DetailActivity.EXTRA_TITLE, movies.get(position).getTitle());
-                            i.putExtra(DetailActivity.EXTRA_OVERVIEW, movies.get(position).getOverview());
-                            i.putExtra(DetailActivity.EXTRA_TIME, movies.get(position).getReleaseDate());
-                            i.putExtra(DetailActivity.EXTRA_POSTER, movies.get(position).getPosterPath());
-                            i.putExtra(DetailActivity.EXTRA_LANGUAGE, movies.get(position).getOriginalLanguage());
-                            i.putExtra(DetailActivity.EXTRA_GENRES, movies.get(position).getGenre());
-                            i.putExtra(DetailActivity.EXTRA_VOTE, movies.get(position).getVoteAverage());
-                            i.putExtra(DetailActivity.EXTRA_YTLINK, trailerMap.get(movies.get(position).getId()));
-                            getContext().startActivity(i);
-                        }
-                        return false;
-                    }
-
-                    @Override
-                    public void onTouchEvent(RecyclerView rv, MotionEvent e) { }
-
-                    @Override
-                    public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) { }
-                });
-            }
-
-            @Override
-            public void onFailure(Call<MovieResponse>call, Throwable t) { }
-        });
+                @Override
+                public void onFailure(Call<MovieResponse> call, Throwable t) { }
+            });
+        }
     }
 }
