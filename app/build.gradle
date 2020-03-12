@@ -81,4 +81,7 @@ dependencies {
     //Youtube player + chromecast sender
     implementation 'com.pierfrancescosoffritti.androidyoutubeplayer:core:10.0.5'
     implementation 'com.pierfrancescosoffritti.androidyoutubeplayer:chromecast-sender:0.23'
+
+    //ChipGroup
+    implementation 'com.google.android.material:material:1.0.0'
 }

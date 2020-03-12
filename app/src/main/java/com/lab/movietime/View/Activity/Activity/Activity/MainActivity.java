@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -198,18 +197,6 @@ public class MainActivity extends AppCompatActivity {
                     final RecyclerView recyclerView = findViewById(R.id.rc_view);
                     if (recyclerView !=null){
                         recyclerView.setAdapter(new MoviesAdapter(movies, R.layout.content_main, getApplicationContext()));
-                    }
-
-
-                    if (movies != null ){
-
-                        MovieModel firstMovie = movies.get(0);
-                        if(firstMovie != null) {
-                            Log.i("TAG","#Log "+firstMovie.getTitle());
-
-                            Toast toast = Toast.makeText(getApplicationContext(), "I dati sono stati aggiornati correttamente", Toast.LENGTH_SHORT);
-                            toast.show();
-                        }
                     }
                 }
 

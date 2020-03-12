@@ -4,6 +4,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -50,6 +51,50 @@
             android:background="@color/cardview_shadow_end_color"
             app:srcCompat="@mipmap/search_button" />
     </LinearLayout>
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.chip.ChipGroup
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/chipGroup"
+            app:singleSelection="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="12dp"
+            app:singleLine="true">
+            <com.google.android.material.chip.Chip
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/chipPopular"
+                app:chipBackgroundColor="@color/colorPrimary"
+                android:text="Most popular"
+                android:layout_marginHorizontal="@dimen/_4sdp"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                />
+            <com.google.android.material.chip.Chip
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/chipRecent"
+                android:text="Most recent"
+                app:chipBackgroundColor="@color/colorPrimary"
+                android:layout_marginHorizontal="@dimen/_4sdp"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                />
+            <com.google.android.material.chip.Chip
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/chipRated"
+                android:text="Most rated"
+                app:chipBackgroundColor="@color/colorPrimary"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                />
+        </com.google.android.material.chip.ChipGroup>
+    </HorizontalScrollView>
 
     <LinearLayout
         android:layout_below="@+id/layoutSearchBar"
