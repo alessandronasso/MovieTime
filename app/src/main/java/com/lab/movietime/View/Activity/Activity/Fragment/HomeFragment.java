@@ -89,9 +89,8 @@ public class HomeFragment extends Fragment {
         mPullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, new HomeFragment())
-                        .commit();
+                reloadMovie();
+                for (int i=0; i<NUM_ROWS; i++) recyclerView[i].getAdapter().notifyDataSetChanged();
                 mPullToRefresh.setRefreshing(false);
             }
         });
@@ -174,6 +173,54 @@ public class HomeFragment extends Fragment {
 
                 @Override
                 public void onFailure(Call<MovieResponse> call, Throwable t) { }
+            });
+        }
+    }
+
+    private void reloadMovie () {
+        Random rand = new Random(System.currentTimeMillis());
+        ApiService apiService = ApiBuilder.getClient(getContext()).create(ApiService.class);
+        List<Integer> randomGenre = new ArrayList<>();
+        for (int j = 0; j < NUM_ROWS; j++) {
+            //GENERATING THE EXPLORE SECTION
+            int rand_tmp = rand.nextInt(GENRE.length);
+            while (randomGenre.contains(rand_tmp)) rand_tmp = rand.nextInt(GENRE.length);
+            randomGenre.add(rand_tmp);
+            genre[j].setText(MAP_NAME.get(GENRE[rand_tmp]));
+            //SETTING THE LAYOUT
+            recyclerView[j].setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL, false));
+            //SETTING THE CALL
+            call[j] = apiService.getDiscover(BuildConfig.API_KEY, Values.LANGUAGE, Values.SORT_BY[0], Values.ADULT, GENRE[randomGenre.get(j)], Values.PAGE[rand.nextInt(5)]);
+        }
+
+        for (int j = 0; j < NUM_ROWS; j++) {
+            int finalJ = j;
+            call[j].enqueue(new Callback<MovieResponse>() {
+                @Override
+                public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
+                    final List<MovieModel> movies = response.body().getResults();
+                    for (int i = 0; i < movies.size(); i++) {
+                        Call<MovieTrailerResponse> callT = apiService.getMovieTrailer(movies.get(i).getId(), BuildConfig.API_KEY);
+                        callT.enqueue(new Callback<MovieTrailerResponse>() {
+                            @Override
+                            public void onResponse(Call<MovieTrailerResponse> call2, Response<MovieTrailerResponse> response2) {
+                                List<MovieTrailer> mt = response2.body().getResults();
+                                Integer mtID = response2.body().getId();
+                                if (mt.isEmpty()) trailerMap.put(mtID, "S0Q4gqBUs7c");
+                                else trailerMap.put(mtID, mt.get(0).getKey());
+                            }
+
+                            @Override
+                            public void onFailure(Call<MovieTrailerResponse> call2, Throwable t) {
+                            }
+                        });
+                    }
+                    recyclerView[finalJ].setAdapter(new MoviesAdapter(movies, R.layout.content_main, getContext()));
+                }
+
+                @Override
+                public void onFailure(Call<MovieResponse> call, Throwable t) {
+                }
             });
         }
     }
