@@ -83,7 +83,6 @@ public class HomeFragment extends Fragment {
         recyclerView[2] = view.findViewById(R.id.rc_view3);
 
         mPullToRefresh = view.findViewById(R.id.swipe_list);
-
         loadMovie();
 
         mPullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {

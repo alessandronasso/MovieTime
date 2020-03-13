@@ -53,7 +53,7 @@
             android:id="@+id/container"
             android:layout_below="@id/youtubePlayer"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/_220sdp"
+            android:layout_height="wrap_content"
             android:paddingTop="@dimen/_9sdp"
             android:orientation="horizontal">
 
@@ -116,7 +116,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textColor="#ffffff"
-                    android:layout_below="@id/overviewTextView"
                     android:background="@drawable/layout_rounded_corner"
                     android:text="Add to watchlist"/>
 
@@ -124,34 +123,98 @@
             </LinearLayout>
         </LinearLayout>
 
-        <TextView
-            android:layout_marginTop="16dp"
-            android:id="@+id/overviewHeader"
+        <!-- BEGINNING BLOCK -->
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_below="@id/container"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:textColor="#ffffff"
-            android:text="Overview"
-            android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
-            android:textStyle="bold"/>
 
-        <TextView
-            android:layout_below="@id/overviewHeader"
-            android:id="@+id/overviewTextView"
-            android:layout_width="wrap_content"
-            android:ellipsize="end"
-            android:textColor="#ffffff"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            tools:text="Twenty-two years after the events of Jurassic Park, Isla Nublar now features a fully functioning dinosaur theme park, Jurassic World, as originally envisioned by John Hammond. Twenty-two years after the events of Jurassic Park, Isla Nublar now features a fully functioning dinosaur theme park, Jurassic World, as originally envisioned by John Hammond. Twenty-two years after the events of Jurassic Park, Isla Nublar now features a fully functioning dinosaur theme park, Jurassic World, as originally envisioned by John Hammond."/>
+            >
 
+            <TextView
+                android:layout_marginTop="16dp"
+                android:id="@+id/releaseDateHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:textColor="#ffffff"
+                android:text="Release Date"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+                android:textStyle="bold"/>
 
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"/>
+            <TextView
+                android:layout_below="@id/releaseDateHeader"
+                android:id="@+id/releaseDateTextView"
+                android:layout_width="wrap_content"
+                android:ellipsize="end"
+                android:textColor="#ffffff"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                tools:text="ff"/>
 
+            <TextView
+                android:layout_marginTop="16dp"
+                android:layout_marginRight="16dp"
+                android:id="@+id/countryHeader"
+                android:layout_alignParentEnd="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:textColor="#ffffff"
+                android:text="Language"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:layout_below="@id/countryHeader"
+                android:id="@+id/countryTextView"
+                android:layout_marginRight="16dp"
+                android:layout_width="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:ellipsize="end"
+                android:textColor="#ffffff"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                tools:text="ff"/>
+
+            <!-- END OF BLOCK -->
+
+            <TextView
+                android:layout_marginTop="16dp"
+                android:id="@+id/overviewHeader"
+                android:layout_below="@id/countryTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:textColor="#ffffff"
+                android:text="Overview"
+                android:layout_centerHorizontal="true"
+                android:gravity="center"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:layout_below="@id/overviewHeader"
+                android:id="@+id/overviewTextView"
+                android:layout_width="wrap_content"
+                android:ellipsize="end"
+                android:textColor="#ffffff"
+                android:paddingLeft="@dimen/_10sdp"
+                android:paddingRight="@dimen/_3sdp"
+                android:paddingTop="@dimen/_10sdp"
+                android:paddingBottom="@dimen/_10sdp"
+                android:background="@layout/rounded_border_textview"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginLeft="8dp"
+                tools:text="Twenty-two years after the events of Jurassic Park, Isla Nublar now features a fully functioning dinosaur theme park, Jurassic World, as originally envisioned by John Hammond. Twenty-two years after the events of Jurassic Park, Isla Nublar now features a fully functioning dinosaur theme park, Jurassic World, as originally envisioned by John Hammond. Twenty-two years after the events of Jurassic Park, Isla Nublar now features a fully functioning dinosaur theme park, Jurassic World, as originally envisioned by John Hammond."/>
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"/>
+        </RelativeLayout>
     </RelativeLayout>
 </ScrollView>

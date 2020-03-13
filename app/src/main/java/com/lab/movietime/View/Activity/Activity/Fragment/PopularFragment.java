@@ -62,6 +62,11 @@ public class PopularFragment extends Fragment {
     }
 
     @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         onPause();
@@ -112,18 +117,12 @@ public class PopularFragment extends Fragment {
                 }
             }
         });
-
         loadMovie();
         return view;
     }
 
     public void deselectAllChips () {
         for (int i=0; i < 3; i++) chipTopRow[i].setCloseIconVisible(false);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
     }
 
     private void loadMovie() {

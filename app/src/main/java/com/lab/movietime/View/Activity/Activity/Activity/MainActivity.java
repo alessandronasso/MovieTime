@@ -9,7 +9,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -46,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
     private int counter=0;
     public static int currentIndex;
     private int currentApiVersion;
-
 
     private void loadFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager()
@@ -187,7 +185,6 @@ public class MainActivity extends AppCompatActivity {
         ApiService apiService = ApiBuilder.getClient(MainActivity.this).create(ApiService.class);
         @Override
         public void onReceive(Context context, Intent intent) {
-            String someValue = intent.getStringExtra("someName");
             counter+=1;
             Call<MovieResponse> call = apiService.getPopular(Values.CATEGORY[0],BuildConfig.API_KEY,Values.LANGUAGE,counter);
             call.enqueue(new Callback<MovieResponse>() {
@@ -201,12 +198,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onFailure(Call<MovieResponse>call, Throwable t) {
-                    // Log error here since request failed
-
-                    Log.i("TAG","#Log "+t);
-
-                }
+                public void onFailure(Call<MovieResponse>call, Throwable t) { }
             });
         }
     };

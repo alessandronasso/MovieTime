@@ -17,11 +17,14 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        hideNavigationBar();
         setContentView(R.layout.splash_layout);
+        hideNavigationBar();
         Intent intent = new Intent(this, MainActivity.class);
+        hideNavigationBar();
         startActivity(intent);
+        hideNavigationBar();
         finish();
+        hideNavigationBar();
     }
 
     private void hideNavigationBar() {

@@ -11,9 +11,7 @@ import com.lab.movietime.R;
 
 public class NetworkNotAvailable extends Fragment {
 
-    public NetworkNotAvailable(){
-
-    }
+    public NetworkNotAvailable() { }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

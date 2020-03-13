@@ -1,9 +1,11 @@
 package com.lab.movietime.Interface;
 
 import com.lab.movietime.BuildConfig;
+import com.lab.movietime.Model.LanguageModel;
 import com.lab.movietime.Model.MovieResponse;
 import com.lab.movietime.Model.MovieTrailerResponse;
 
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -31,6 +33,10 @@ public interface ApiService {
             @Query("include_adult") Boolean adult,
             @Query("with_genres") int genre,
             @Query("page") int page);
+
+    @GET("configuration/languages")
+    Call<List<LanguageModel>> getLanguages(
+            @Query("api_key") String apiKey);
 
     @GET("movie/upcoming")
     Call<MovieResponse> getUpcoming(

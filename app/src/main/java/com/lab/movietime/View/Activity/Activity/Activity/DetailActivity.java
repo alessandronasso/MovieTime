@@ -17,8 +17,12 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.lab.movietime.BuildConfig;
+import com.lab.movietime.Interface.ApiBuilder;
+import com.lab.movietime.Interface.ApiService;
 import com.lab.movietime.Interface.DBHandler;
 import com.lab.movietime.Listener.OnSwipeTouchListener;
+import com.lab.movietime.Model.LanguageModel;
 import com.lab.movietime.R;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener;
@@ -27,9 +31,14 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTube
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static com.lab.movietime.BuildConfig.URL_POSTER;
 
@@ -43,15 +52,14 @@ public class DetailActivity extends AppCompatActivity {
     public static String EXTRA_GENRES = "extra_genres";
     public static String EXTRA_VOTE = "extra_vote";
     public static String EXTRA_YTLINK = "extra_ytlink";
-    public static String IS_FAVORITE = "is_favorite";
 
     private int currentApiVersion;
-
+    private HashMap<String, String> mapLang = new HashMap<>();
 
     @BindView(R.id.movieTitle) TextView tvTitle;
     @BindView(R.id.overviewTextView) TextView tvOverview;
-    //@BindView(R.id.durationTextView) TextView tvTime;
-    //@BindView(R.id.languageTextView) TextView tvLanguage;
+    @BindView(R.id.countryTextView) TextView tvLanguage;
+    @BindView(R.id.releaseDateTextView) TextView tvReleaseDate;
     @BindView(R.id.genresTextView) TextView tvGenres;
     @BindView(R.id.posterImg) ImageView imgPoster;
     @BindView(R.id.favButton) Button btnFav;
@@ -73,90 +81,105 @@ public class DetailActivity extends AppCompatActivity {
         setContentView(R.layout.detail_activity);
         addGestures();
         hideNavigationBar();
-
-        ButterKnife.bind(this);
-        int id = getIntent().getIntExtra(EXTRA_ID, 0);
-        String title = getIntent().getStringExtra(EXTRA_TITLE);
-        String overview = getIntent().getStringExtra(EXTRA_OVERVIEW);
-        String time = getIntent().getStringExtra(EXTRA_TIME);
-        String poster = getIntent().getStringExtra(EXTRA_POSTER);
-        String language = getIntent().getStringExtra(EXTRA_LANGUAGE);
-        String genres = getIntent().getStringExtra(EXTRA_GENRES);
-        double vote = getIntent().getDoubleExtra(EXTRA_VOTE, 0);
-        final boolean[] isFav = {false};
-
-        db.open();
-        Cursor c = db.getMovies();
-        if (c.moveToFirst()) {
-            do {
-                if (c.getString(0).equals(Integer.toString(id))) {
-                    isFav[0] = true;
-                    btnFav.setText("Remove from watchlist");
+        initializeMapLang();
+        ApiService apiService = ApiBuilder.getClient(DetailActivity.this).create(ApiService.class);
+        Call<List<LanguageModel>> call = apiService.getLanguages(BuildConfig.API_KEY);
+        call.enqueue(new Callback<List<LanguageModel>>() {
+            @Override
+            public void onResponse(Call<List<LanguageModel>> call, Response<List<LanguageModel>> response) {
+                List<LanguageModel> lM = response.body();
+                for (int i = 0; i < lM.size(); i++) {
+                    mapLang.put(lM.get(i).getId().toLowerCase(), lM.get(i).getOriginalLanguage());
                 }
-            } while (c.moveToNext());
-        }
-        db.close();
+                ButterKnife.bind(DetailActivity.this);
+                int id = getIntent().getIntExtra(EXTRA_ID, 0);
+                String title = getIntent().getStringExtra(EXTRA_TITLE);
+                String overview = getIntent().getStringExtra(EXTRA_OVERVIEW);
+                String time = getIntent().getStringExtra(EXTRA_TIME);
+                String poster = getIntent().getStringExtra(EXTRA_POSTER);
+                String language = getIntent().getStringExtra(EXTRA_LANGUAGE);
+                String genres = getIntent().getStringExtra(EXTRA_GENRES);
+                double vote = getIntent().getDoubleExtra(EXTRA_VOTE, 0);
+                final boolean[] isFav = {false};
 
-        tvTitle.setText(title);
-        tvOverview.setText(overview);
-        //tvLanguage.setText(language);
-        tvGenres.setText(genres);
-        //ab.setTitle(title);
-        setRatingBar(vote);
-
-        youTubePlayerView = findViewById(R.id.youtube_player_view);
-        getLifecycle().addObserver(youTubePlayerView);
-
-        youTubePlayerView.addYouTubePlayerListener(new AbstractYouTubePlayerListener() {
-            @Override
-            public void onReady(@NonNull YouTubePlayer youTubePlayer) {
-                youTubePlayer.loadVideo(getIntent().getStringExtra(EXTRA_YTLINK), 0);
-                youTubePlayer.pause();
-            }
-        });
-
-        SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd");
-        Date date = null;
-        try {
-            date = parser.parse(time);
-            SimpleDateFormat formatter = new SimpleDateFormat("EEEE, dd MMM, yyyy");
-            String formattedDate = formatter.format(date);
-            //tvTime.setText(formattedDate);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        Glide.with(this).load(URL_POSTER+poster)
-                .listener(new RequestListener<String, GlideDrawable>() {
-                    @Override
-                    public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
-                        progressBar.setVisibility(View.INVISIBLE);
-                        return false;
-                    }
-
-                    @Override
-                    public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                        progressBar.setVisibility(View.INVISIBLE);
-                        return false;
-                    }
-                })
-                .into(imgPoster);
-
-        btnFav.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
                 db.open();
-                if (!isFav[0]){
-                    db.insertMovie(Integer.toString(id), title);
-                    isFav[0] = true;
-                    btnFav.setText("Remove from watchlist");
-                } else {
-                    db.removeMovie(Integer.toString(id));
-                    isFav[0] = false;
-                    btnFav.setText("add to watchlist");
+                Cursor c = db.getMovies();
+                if (c.moveToFirst()) {
+                    do {
+                        if (c.getString(0).equals(Integer.toString(id))) {
+                            isFav[0] = true;
+                            btnFav.setText("Remove from watchlist");
+                        }
+                    } while (c.moveToNext());
                 }
                 db.close();
+
+                tvTitle.setText(title);
+                tvLanguage.setText(mapLang.get(language.toLowerCase()));
+                tvOverview.setText(overview);
+                tvReleaseDate.setText(time);
+                tvGenres.setText(genres);
+                setRatingBar(vote);
+
+                youTubePlayerView = findViewById(R.id.youtube_player_view);
+                getLifecycle().addObserver(youTubePlayerView);
+
+                youTubePlayerView.addYouTubePlayerListener(new AbstractYouTubePlayerListener() {
+                    @Override
+                    public void onReady(@NonNull YouTubePlayer youTubePlayer) {
+                        youTubePlayer.loadVideo(getIntent().getStringExtra(EXTRA_YTLINK), 0);
+                        youTubePlayer.pause();
+                    }
+                });
+
+                SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd");
+                Date date = null;
+                try {
+                    date = parser.parse(time);
+                    SimpleDateFormat formatter = new SimpleDateFormat("EEEE, dd MMM, yyyy");
+                    String formattedDate = formatter.format(date);
+                    //tvTime.setText(formattedDate);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                Glide.with(DetailActivity.this).load(URL_POSTER+poster)
+                        .listener(new RequestListener<String, GlideDrawable>() {
+                            @Override
+                            public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                                progressBar.setVisibility(View.INVISIBLE);
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                                progressBar.setVisibility(View.INVISIBLE);
+                                return false;
+                            }
+                        })
+                        .into(imgPoster);
+
+                btnFav.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        db.open();
+                        if (!isFav[0]){
+                            db.insertMovie(Integer.toString(id), title);
+                            isFav[0] = true;
+                            btnFav.setText("Remove from watchlist");
+                        } else {
+                            db.removeMovie(Integer.toString(id));
+                            isFav[0] = false;
+                            btnFav.setText("add to watchlist");
+                        }
+                        db.close();
+                    }
+                });
             }
+
+            @Override
+            public void onFailure(Call<List<LanguageModel>> call, Throwable t) { }
         });
+
     }
 
     private void addGestures () {
@@ -205,6 +228,23 @@ public class DetailActivity extends AppCompatActivity {
         ratingBar.setStepSize((float) 0.25);
         ratingBar.setIsIndicator(true);
         ratingBar.setRating((float) vote);
+    }
+
+    private void initializeMapLang() {
+        ApiService apiService = ApiBuilder.getClient(DetailActivity.this).create(ApiService.class);
+        Call<List<LanguageModel>> call = apiService.getLanguages(BuildConfig.API_KEY);
+        call.enqueue(new Callback<List<LanguageModel>>() {
+            @Override
+            public void onResponse(Call<List<LanguageModel>> call, Response<List<LanguageModel>> response) {
+                List<LanguageModel> lM = response.body();
+                for (int i = 0; i < lM.size(); i++) {
+                    mapLang.put(lM.get(i).getId().toLowerCase(), lM.get(i).getOriginalLanguage());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<LanguageModel>> call, Throwable t) { }
+        });
     }
 }
 
