@@ -55,9 +55,9 @@ public class HomeFragment extends Fragment {
 
     SwipeRefreshLayout mPullToRefresh;
 
-    public HomeFragment() {
-        // Required empty public constructor
-    }
+    private List<List<MovieModel>> movieList = new ArrayList<>();
+
+    public HomeFragment() { }
 
     public static HomeFragment newInstance(String param1, String param2) {
         HomeFragment fragment = new HomeFragment();
@@ -83,7 +83,9 @@ public class HomeFragment extends Fragment {
         recyclerView[2] = view.findViewById(R.id.rc_view3);
 
         mPullToRefresh = view.findViewById(R.id.swipe_list);
-        loadMovie();
+
+        if (movieList.size()==0) loadMovie();
+        else refreshList();
 
         mPullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -118,7 +120,8 @@ public class HomeFragment extends Fragment {
             call[j].enqueue(new Callback<MovieResponse>() {
                 @Override
                 public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
-                    final List<MovieModel> movies = response.body().getResults();
+                    List <MovieModel> movies = response.body().getResults();
+                    movieList.add(movies);
                     for (int i = 0; i < movies.size(); i++) {
                         Call<MovieTrailerResponse> callT = apiService.getMovieTrailer(movies.get(i).getId(), BuildConfig.API_KEY);
                         callT.enqueue(new Callback<MovieTrailerResponse>() {
@@ -194,10 +197,12 @@ public class HomeFragment extends Fragment {
 
         for (int j = 0; j < NUM_ROWS; j++) {
             int finalJ = j;
+            int finalJ1 = j;
             call[j].enqueue(new Callback<MovieResponse>() {
                 @Override
                 public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
                     final List<MovieModel> movies = response.body().getResults();
+                    movieList.set(finalJ1, movies);
                     for (int i = 0; i < movies.size(); i++) {
                         Call<MovieTrailerResponse> callT = apiService.getMovieTrailer(movies.get(i).getId(), BuildConfig.API_KEY);
                         callT.enqueue(new Callback<MovieTrailerResponse>() {
@@ -220,6 +225,49 @@ public class HomeFragment extends Fragment {
                 @Override
                 public void onFailure(Call<MovieResponse> call, Throwable t) {
                 }
+            });
+        }
+    }
+
+    private void refreshList() {
+        for (int j = 0; j < NUM_ROWS; j++) {
+            genre[j].setText(MAP_NAME.get(GENRE[j]));
+            recyclerView[j].setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL, false));
+            recyclerView[j].setAdapter(new MoviesAdapter(movieList.get(j), R.layout.content_main, getContext()));
+            int finalJ = j;
+            recyclerView[j].addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
+                GestureDetector gestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
+                    public boolean onSingleTapUp(MotionEvent e) {
+                        return true;
+                    }
+                });
+
+                @Override
+                public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+                    View child = rv.findChildViewUnder(e.getX(), e.getY());
+                    if (child != null && gestureDetector.onTouchEvent(e)) {
+                        int position = rv.getChildAdapterPosition(child);
+                        Intent i = new Intent(getContext(), DetailActivity.class);
+                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        i.putExtra(DetailActivity.EXTRA_ID, movieList.get(finalJ).get(position).getId());
+                        i.putExtra(DetailActivity.EXTRA_TITLE, movieList.get(finalJ).get(position).getTitle());
+                        i.putExtra(DetailActivity.EXTRA_OVERVIEW, movieList.get(finalJ).get(position).getOverview());
+                        i.putExtra(DetailActivity.EXTRA_TIME, movieList.get(finalJ).get(position).getReleaseDate());
+                        i.putExtra(DetailActivity.EXTRA_POSTER, movieList.get(finalJ).get(position).getPosterPath());
+                        i.putExtra(DetailActivity.EXTRA_LANGUAGE, movieList.get(finalJ).get(position).getOriginalLanguage());
+                        i.putExtra(DetailActivity.EXTRA_GENRES, movieList.get(finalJ).get(position).getGenre());
+                        i.putExtra(DetailActivity.EXTRA_VOTE, movieList.get(finalJ).get(position).getVoteAverage());
+                        i.putExtra(DetailActivity.EXTRA_YTLINK, trailerMap.get(movieList.get(finalJ).get(position).getId()));
+                        getContext().startActivity(i);
+                    }
+                    return false;
+                }
+
+                @Override
+                public void onTouchEvent(RecyclerView rv, MotionEvent e) { }
+
+                @Override
+                public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) { }
             });
         }
     }

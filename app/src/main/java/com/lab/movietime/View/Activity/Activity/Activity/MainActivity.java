@@ -28,7 +28,6 @@ import com.lab.movietime.Model.MovieModel;
 import com.lab.movietime.Model.MovieResponse;
 import com.lab.movietime.R;
 import com.lab.movietime.View.Activity.Activity.Fragment.HomeFragment;
-import com.lab.movietime.View.Activity.Activity.Fragment.NetworkNotAvailable;
 import com.lab.movietime.View.Activity.Activity.Fragment.PlayingFragment;
 import com.lab.movietime.View.Activity.Activity.Fragment.PopularFragment;
 import com.lab.movietime.values.Values;
@@ -41,17 +40,21 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
-    private final int SECONDS = 30000;
     private int counter=0;
-    public static int currentIndex;
+    public static int currentIndex = 0;
     private int currentApiVersion;
+    private boolean[] alreadyOpened = {false, false, false};
 
-    private void loadFragment(Fragment fragment) {
-        FragmentTransaction transaction = getSupportFragmentManager()
-                .beginTransaction();
-        transaction.replace(R.id.fragment_container, fragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
+    public HomeFragment homeFragment;
+    public PopularFragment popularFragment;
+    public PlayingFragment playingFragment;
+
+
+    private void loadFragment(Fragment fragment, String tag) {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.fragment_container, fragment);
+        ft.addToBackStack(null);
+        ft.commit();
     }
 
     @Override
@@ -59,8 +62,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         hideNavigationBar();
         setContentView(R.layout.activity_main);
-        if(isNetworkAvailable()) loadFragment(new HomeFragment());
-        else loadFragment(new NetworkNotAvailable());
+        if(homeFragment == null){ homeFragment  =new HomeFragment();}
+        loadFragment(homeFragment, "");
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.BottomNavigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
     }
@@ -110,70 +113,21 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
-            Fragment fragment;
             switch (item.getItemId()) {
                 case R.id.bbn_item1:
-                    onResume();
-                    if(isNetworkAvailable()){
-                        fragment = new HomeFragment();
-                    }else {
-                        fragment= new NetworkNotAvailable();
-                    }
-                    currentIndex=0;
-                    FragmentTransaction transaction = getSupportFragmentManager()
-                            .beginTransaction()
-                            .setCustomAnimations(R.anim.pull_in_left,R.anim.push_out_right);
-                    transaction.replace(R.id.fragment_container, fragment);
-                    transaction.addToBackStack(null);
-                    transaction.commit();
-
+                    currentIndex = 0;
+                    if(homeFragment == null){ homeFragment  =new HomeFragment();}
+                    loadFragment(homeFragment, "");
                     return true;
                 case R.id.bbn_item2:
-                    if(isNetworkAvailable()){
-                        fragment = new PopularFragment();
-                    }else {
-                        fragment= new NetworkNotAvailable();
-                    }
-                    try{
-                        if(currentIndex < 1 ){
-                            FragmentTransaction transactionb = getSupportFragmentManager()
-                                    .beginTransaction()
-                                    .setCustomAnimations(R.anim.pull_in_right,R.anim.push_out_left);
-                            transactionb.replace(R.id.fragment_container, fragment);
-                            transactionb.addToBackStack(null);
-                            transactionb.commit();
-                            currentIndex=1;
-
-                        }else if (currentIndex > 1){
-                            FragmentTransaction transactionb = getSupportFragmentManager()
-                                    .beginTransaction()
-                                    .setCustomAnimations(R.anim.pull_in_left,R.anim.push_out_right);
-                            transactionb.replace(R.id.fragment_container, fragment);
-                            transactionb.addToBackStack(null);
-                            transactionb.commit();
-                            currentIndex=1;
-                        }
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-
+                    currentIndex = 1;
+                    if(popularFragment == null){ popularFragment  =new PopularFragment();}
+                    loadFragment(popularFragment, "");
                     return true;
                 case R.id.bbn_item3:
-                    if(isNetworkAvailable()){
-                        fragment = new PlayingFragment();
-                    }else {
-                        fragment= new NetworkNotAvailable();
-                    }
-                    currentIndex=2;
-                    FragmentTransaction transactionc = getSupportFragmentManager()
-                            .beginTransaction()
-                            .setCustomAnimations(R.anim.pull_in_right,R.anim.push_out_left);
-                    transactionc.replace(R.id.fragment_container, fragment);
-                    transactionc.addToBackStack(null);
-                    transactionc.commit();
+                    currentIndex = 2;
+                    if(playingFragment == null){ playingFragment  =new PlayingFragment();}
+                    loadFragment(playingFragment, "");
                     return true;
             }
             return false;
