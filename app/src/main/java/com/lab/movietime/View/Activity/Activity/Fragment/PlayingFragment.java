@@ -56,20 +56,29 @@ public class PlayingFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        onPause();
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        if (recyclerView.getAdapter()!=null) {
+            getActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new PlayingFragment())
+                    .commit();
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.playing_fragment, container, false);
         recyclerView = view.findViewById(R.id.playing_rc_view);
-        if (movies.size()==0) loadMovie();
-        else refreshList();
+        movies = new ArrayList<>();
+        loadMovie();
+        if (recyclerView.getAdapter()!=null) {
+            getActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new PlayingFragment())
+                    .commit();
+        }
         return view;
     }
 
@@ -151,44 +160,5 @@ public class PlayingFragment extends Fragment {
             public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) { }
         });
         db.close();
-    }
-
-    private void refreshList() {
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL, false));
-        recyclerView.setAdapter(new PopularAdapter(movies, R.layout.content_main, getContext()));
-        recyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
-            GestureDetector gestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
-                public boolean onSingleTapUp(MotionEvent e){
-                    return true;
-                }
-            });
-
-            @Override
-            public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-                View child = rv.findChildViewUnder(e.getX(), e.getY());
-                if (child != null && gestureDetector.onTouchEvent(e)){
-                    int position = rv.getChildAdapterPosition(child);
-                    Intent i = new Intent(getContext(), DetailActivity.class);
-                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    i.putExtra(DetailActivity.EXTRA_ID, movies.get(position).getId());
-                    i.putExtra(DetailActivity.EXTRA_TITLE, movies.get(position).getTitle());
-                    i.putExtra(DetailActivity.EXTRA_OVERVIEW, movies.get(position).getOverview());
-                    i.putExtra(DetailActivity.EXTRA_TIME, movies.get(position).getReleaseDate());
-                    i.putExtra(DetailActivity.EXTRA_POSTER, movies.get(position).getPosterPath());
-                    i.putExtra(DetailActivity.EXTRA_LANGUAGE, movies.get(position).getOriginalLanguage());
-                    i.putExtra(DetailActivity.EXTRA_GENRES, movies.get(position).getGenre());
-                    i.putExtra(DetailActivity.EXTRA_VOTE, movies.get(position).getVoteAverage());
-                    i.putExtra(DetailActivity.EXTRA_YTLINK, trailerMap.get(movies.get(position).getId()));
-                    getContext().startActivity(i);
-                }
-                return false;
-            }
-
-            @Override
-            public void onTouchEvent(RecyclerView rv, MotionEvent e) { }
-
-            @Override
-            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) { }
-        });
     }
 }

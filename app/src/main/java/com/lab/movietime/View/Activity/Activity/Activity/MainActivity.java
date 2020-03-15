@@ -43,14 +43,13 @@ public class MainActivity extends AppCompatActivity {
     private int counter=0;
     public static int currentIndex = 0;
     private int currentApiVersion;
-    private boolean[] alreadyOpened = {false, false, false};
 
     public HomeFragment homeFragment;
     public PopularFragment popularFragment;
     public PlayingFragment playingFragment;
 
 
-    private void loadFragment(Fragment fragment, String tag) {
+    private void loadFragment(Fragment fragment) {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, fragment);
         ft.addToBackStack(null);
@@ -63,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
         hideNavigationBar();
         setContentView(R.layout.activity_main);
         if(homeFragment == null){ homeFragment  =new HomeFragment();}
-        loadFragment(homeFragment, "");
+        loadFragment(homeFragment);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.BottomNavigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
     }
@@ -93,11 +92,9 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressLint("NewApi")
     @Override
-    public void onWindowFocusChanged(boolean hasFocus)
-    {
+    public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        if(currentApiVersion >= Build.VERSION_CODES.KITKAT && hasFocus)
-        {
+        if(currentApiVersion >= Build.VERSION_CODES.KITKAT && hasFocus) {
             getWindow().getDecorView().setSystemUiVisibility(
                     View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                             | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
@@ -116,18 +113,18 @@ public class MainActivity extends AppCompatActivity {
             switch (item.getItemId()) {
                 case R.id.bbn_item1:
                     currentIndex = 0;
-                    if(homeFragment == null){ homeFragment  =new HomeFragment();}
-                    loadFragment(homeFragment, "");
+                    if(homeFragment == null) homeFragment = new HomeFragment();
+                    loadFragment(homeFragment);
                     return true;
                 case R.id.bbn_item2:
                     currentIndex = 1;
-                    if(popularFragment == null){ popularFragment  =new PopularFragment();}
-                    loadFragment(popularFragment, "");
+                    if(popularFragment == null) popularFragment = new PopularFragment();
+                    loadFragment(popularFragment);
                     return true;
                 case R.id.bbn_item3:
                     currentIndex = 2;
-                    if(playingFragment == null){ playingFragment  =new PlayingFragment();}
-                    loadFragment(playingFragment, "");
+                    if(playingFragment == null) playingFragment = new PlayingFragment();
+                    loadFragment(playingFragment);
                     return true;
             }
             return false;

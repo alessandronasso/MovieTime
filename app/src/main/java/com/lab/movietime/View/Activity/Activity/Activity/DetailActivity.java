@@ -117,7 +117,6 @@ public class DetailActivity extends AppCompatActivity {
                 tvTitle.setText(title);
                 tvLanguage.setText(mapLang.get(language.toLowerCase()));
                 tvOverview.setText(overview);
-                tvReleaseDate.setText(time);
                 tvGenres.setText(genres);
                 setRatingBar(vote);
 
@@ -136,9 +135,9 @@ public class DetailActivity extends AppCompatActivity {
                 Date date = null;
                 try {
                     date = parser.parse(time);
-                    SimpleDateFormat formatter = new SimpleDateFormat("EEEE, dd MMM, yyyy");
+                    SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy");
                     String formattedDate = formatter.format(date);
-                    //tvTime.setText(formattedDate);
+                    tvReleaseDate.setText(formattedDate);
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -237,9 +236,8 @@ public class DetailActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<List<LanguageModel>> call, Response<List<LanguageModel>> response) {
                 List<LanguageModel> lM = response.body();
-                for (int i = 0; i < lM.size(); i++) {
+                for (int i = 0; i < lM.size(); i++)
                     mapLang.put(lM.get(i).getId().toLowerCase(), lM.get(i).getOriginalLanguage());
-                }
             }
 
             @Override

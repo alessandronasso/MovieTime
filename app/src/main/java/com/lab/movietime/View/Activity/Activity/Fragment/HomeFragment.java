@@ -57,6 +57,8 @@ public class HomeFragment extends Fragment {
 
     private List<List<MovieModel>> movieList = new ArrayList<>();
 
+    private List<Integer> randomGenre = new ArrayList<>();
+
     public HomeFragment() { }
 
     public static HomeFragment newInstance(String param1, String param2) {
@@ -91,7 +93,8 @@ public class HomeFragment extends Fragment {
             @Override
             public void onRefresh() {
                 reloadMovie();
-                for (int i=0; i<NUM_ROWS; i++) recyclerView[i].getAdapter().notifyDataSetChanged();
+                for (int i=0; i<NUM_ROWS; i++)
+                    recyclerView[i].getAdapter().notifyDataSetChanged();
                 mPullToRefresh.setRefreshing(false);
             }
         });
@@ -102,16 +105,13 @@ public class HomeFragment extends Fragment {
     private void loadMovie() {
         Random rand = new Random(System.currentTimeMillis());
         ApiService apiService = ApiBuilder.getClient(getContext()).create(ApiService.class);
-        List<Integer> randomGenre = new ArrayList<>();
+        randomGenre = new ArrayList<>();
         for (int j = 0; j < NUM_ROWS; j++) {
-            //GENERATING THE EXPLORE SECTION
             int rand_tmp = rand.nextInt(GENRE.length);
             while (randomGenre.contains(rand_tmp)) rand_tmp = rand.nextInt(GENRE.length);
             randomGenre.add(rand_tmp);
             genre[j].setText(MAP_NAME.get(GENRE[rand_tmp]));
-            //SETTING THE LAYOUT
             recyclerView[j].setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL, false));
-            //SETTING THE CALL
             call[j] = apiService.getDiscover(BuildConfig.API_KEY, Values.LANGUAGE, Values.SORT_BY[0], Values.ADULT, GENRE[randomGenre.get(j)], Values.PAGE[rand.nextInt(5)]);
         }
 
@@ -121,6 +121,7 @@ public class HomeFragment extends Fragment {
                 @Override
                 public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
                     List <MovieModel> movies = response.body().getResults();
+                    removeEmptyMovie(movies);
                     movieList.add(movies);
                     for (int i = 0; i < movies.size(); i++) {
                         Call<MovieTrailerResponse> callT = apiService.getMovieTrailer(movies.get(i).getId(), BuildConfig.API_KEY);
@@ -182,16 +183,13 @@ public class HomeFragment extends Fragment {
     private void reloadMovie () {
         Random rand = new Random(System.currentTimeMillis());
         ApiService apiService = ApiBuilder.getClient(getContext()).create(ApiService.class);
-        List<Integer> randomGenre = new ArrayList<>();
+        randomGenre = new ArrayList<>();
         for (int j = 0; j < NUM_ROWS; j++) {
-            //GENERATING THE EXPLORE SECTION
             int rand_tmp = rand.nextInt(GENRE.length);
             while (randomGenre.contains(rand_tmp)) rand_tmp = rand.nextInt(GENRE.length);
             randomGenre.add(rand_tmp);
             genre[j].setText(MAP_NAME.get(GENRE[rand_tmp]));
-            //SETTING THE LAYOUT
             recyclerView[j].setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL, false));
-            //SETTING THE CALL
             call[j] = apiService.getDiscover(BuildConfig.API_KEY, Values.LANGUAGE, Values.SORT_BY[0], Values.ADULT, GENRE[randomGenre.get(j)], Values.PAGE[rand.nextInt(5)]);
         }
 
@@ -231,7 +229,7 @@ public class HomeFragment extends Fragment {
 
     private void refreshList() {
         for (int j = 0; j < NUM_ROWS; j++) {
-            genre[j].setText(MAP_NAME.get(GENRE[j]));
+            genre[j].setText(MAP_NAME.get(GENRE[randomGenre.get(j)]));
             recyclerView[j].setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL, false));
             recyclerView[j].setAdapter(new MoviesAdapter(movieList.get(j), R.layout.content_main, getContext()));
             int finalJ = j;
@@ -269,6 +267,16 @@ public class HomeFragment extends Fragment {
                 @Override
                 public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) { }
             });
+        }
+    }
+
+    private void removeEmptyMovie (List<MovieModel> movies) {
+        for (int i = 0; i < movies.size(); i++) {
+            if (movies.get(i).getPosterPath() == null
+            || movies.get(i).getBackdropPath() == null
+            || movies.get(i).getVoteCount() == null
+            || movies.get(i).getVoteAverage() ==null)
+                movies.remove(i--);
         }
     }
 }

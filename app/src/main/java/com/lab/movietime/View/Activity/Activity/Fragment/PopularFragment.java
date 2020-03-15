@@ -111,9 +111,8 @@ public class PopularFragment extends Fragment {
                 if (!mSearchField.getText().toString().equals("")) {
                     deselectAllChips();
                     searchMovie(mSearchField.getText().toString());
-                    moviesCopy = new ArrayList<>(movies);
                     recyclerView.getAdapter().notifyDataSetChanged();
-                }
+                } else loadMovie();
             }
         });
         if (movies.size()==0) loadMovie();
@@ -133,7 +132,6 @@ public class PopularFragment extends Fragment {
             @Override
             public void onResponse(Call<MovieResponse>call, Response<MovieResponse> response) {
                 movies = response.body().getResults();
-                moviesCopy = new ArrayList<>(movies);
                 for (int i = 0; i<movies.size(); i++) {
                     Call<MovieTrailerResponse> callT = apiService.getMovieTrailer(movies.get(i).getId(), BuildConfig.API_KEY);
                     callT.enqueue(new Callback<MovieTrailerResponse>() {
@@ -200,6 +198,7 @@ public class PopularFragment extends Fragment {
             @Override
             public void onResponse(Call<MovieResponse>call, Response<MovieResponse> response) {
                 movies = response.body().getResults();
+                moviesCopy = new ArrayList<>(movies);
                 for (int i = 0; i<movies.size(); i++) {
                     Call<MovieTrailerResponse> callT = apiService.getMovieTrailer(movies.get(i).getId(), BuildConfig.API_KEY);
                     callT.enqueue(new Callback<MovieTrailerResponse>() {
@@ -225,7 +224,6 @@ public class PopularFragment extends Fragment {
     }
 
     private void filterBy(int chipID) {
-        movies = new ArrayList<>(moviesCopy);
         switch (chipID) {
             case R.id.chipPopular:
                 filterByMostPopular();
