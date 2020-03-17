@@ -48,8 +48,4 @@
                     app:menu="@menu/bottombar_menu_4items"/>
 
         </LinearLayout>
-
-
-
-
 </RelativeLayout>

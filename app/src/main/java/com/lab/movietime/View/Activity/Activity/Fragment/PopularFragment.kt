@@ -1,0 +1,231 @@
+package com.lab.movietime.View.Activity.Activity.Fragment
+
+import android.content.Intent
+import android.os.Bundle
+import android.view.*
+import android.view.GestureDetector.SimpleOnGestureListener
+import android.widget.EditText
+import android.widget.ImageButton
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.OnItemTouchListener
+import butterknife.BindView
+import com.google.android.material.chip.Chip
+import com.lab.movietime.Adapter.PopularAdapter
+import com.lab.movietime.BuildConfig
+import com.lab.movietime.Interface.ApiBuilder.getClient
+import com.lab.movietime.Interface.ApiService
+import com.lab.movietime.Model.MovieModel
+import com.lab.movietime.Model.MovieResponse
+import com.lab.movietime.Model.MovieTrailer
+import com.lab.movietime.Model.MovieTrailerResponse
+import com.lab.movietime.R
+import com.lab.movietime.View.Activity.Activity.Activity.DetailActivity
+import com.lab.movietime.values.Values
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.util.*
+
+class PopularFragment : Fragment() {
+    private var mSearchField: EditText? = null
+    private var mSearchBtn: ImageButton? = null
+    private val trailerMap = HashMap<Int, String?>()
+    private var movies: List<MovieModel?>? = ArrayList()
+    private var moviesCopy: List<MovieModel?>? = ArrayList()
+    private val chipTopRow = arrayOfNulls<Chip>(3)
+
+    @JvmField
+    @BindView(R.id.rc_view)
+    var recyclerView: RecyclerView? = null
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val view = inflater.inflate(R.layout.popular_fragment, container, false)
+        recyclerView = view.findViewById(R.id.popular_rc_view) as RecyclerView
+        mSearchField = view.findViewById<View>(R.id.search_field) as EditText
+        mSearchBtn = view.findViewById<View>(R.id.search_btn) as ImageButton
+        mSearchBtn!!.setOnClickListener {
+            if (mSearchField!!.text.toString() != "") {
+                searchMovie(mSearchField!!.text.toString())
+            } else loadMovie()
+        }
+
+        if (movies!!.isEmpty()) loadMovie() else refreshList()
+        return view
+    }
+
+    private fun loadMovie() {
+        val apiService = getClient(context)!!.create(ApiService::class.java)
+        recyclerView!!.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        val call = apiService.getPopular(Values.CATEGORY[1], BuildConfig.API_KEY, Values.LANGUAGE, Values.PAGE[0])
+        call!!.enqueue(object : Callback<MovieResponse?> {
+            override fun onResponse(call: Call<MovieResponse?>, response: Response<MovieResponse?>) {
+                movies = response.body()!!.results
+                for (i in movies!!.indices) {
+                    val callT = apiService.getMovieTrailer(movies!![i]!!.id, BuildConfig.API_KEY)
+                    callT!!.enqueue(object : Callback<MovieTrailerResponse?> {
+                        override fun onResponse(call2: Call<MovieTrailerResponse?>, response2: Response<MovieTrailerResponse?>) {
+                            val mt: List<MovieTrailer>? = response2.body()!!.results
+                            val mtID = response2.body()!!.id
+                            if (mt!!.isEmpty()) trailerMap[mtID] = "S0Q4gqBUs7c" else trailerMap[mtID] = mt[0].key
+                        }
+
+                        override fun onFailure(call2: Call<MovieTrailerResponse?>, t: Throwable) {}
+                    })
+                }
+                recyclerView!!.adapter = PopularAdapter(movies as List<MovieModel>, R.layout.content_main, context!!)
+                recyclerView!!.addOnItemTouchListener(object : OnItemTouchListener {
+                    var gestureDetector = GestureDetector(context, object : SimpleOnGestureListener() {
+                        override fun onSingleTapUp(e: MotionEvent): Boolean {
+                            return true
+                        }
+                    })
+
+                    override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
+                        val child = rv.findChildViewUnder(e.x, e.y)
+                        if (child != null && gestureDetector.onTouchEvent(e)) {
+                            val position = rv.getChildAdapterPosition(child)
+                            val i = Intent(context, DetailActivity::class.java)
+                            i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                            i.putExtra(DetailActivity.EXTRA_ID, movies!![position]!!.id)
+                            i.putExtra(DetailActivity.EXTRA_TITLE, movies!![position]!!.title)
+                            i.putExtra(DetailActivity.EXTRA_OVERVIEW, movies!![position]!!.overview)
+                            i.putExtra(DetailActivity.EXTRA_TIME, movies!![position]!!.releaseDate)
+                            i.putExtra(DetailActivity.EXTRA_POSTER, movies!![position]!!.posterPath)
+                            i.putExtra(DetailActivity.EXTRA_LANGUAGE, movies!![position]!!.originalLanguage)
+                            i.putExtra(DetailActivity.EXTRA_GENRES, movies!![position]!!.genre)
+                            i.putExtra(DetailActivity.EXTRA_VOTE, movies!![position]!!.getVoteAverage())
+                            i.putExtra(DetailActivity.EXTRA_YTLINK, trailerMap[movies!![position]!!.id])
+                            context!!.startActivity(i)
+                        }
+                        return false
+                    }
+
+                    override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {}
+                    override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {}
+                })
+            }
+
+            override fun onFailure(call: Call<MovieResponse?>, t: Throwable) {}
+        })
+    }
+
+    private fun searchMovie(movieName: String) {
+        val apiService = getClient(context)!!.create(ApiService::class.java)
+        recyclerView!!.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        val call = apiService.getItemSearch(movieName)
+        call!!.enqueue(object : Callback<MovieResponse?> {
+            override fun onResponse(call: Call<MovieResponse?>, response: Response<MovieResponse?>) {
+                movies = response.body()!!.results
+                moviesCopy = movies
+                for (i in movies!!.indices) {
+                    val callT = apiService.getMovieTrailer(movies!![i]!!.id, BuildConfig.API_KEY)
+                    callT!!.enqueue(object : Callback<MovieTrailerResponse?> {
+                        override fun onResponse(call2: Call<MovieTrailerResponse?>, response2: Response<MovieTrailerResponse?>) {
+                            val mt: List<MovieTrailer>? = response2.body()!!.results
+                            val mtID = response2.body()!!.id
+                            if (mt!!.isEmpty()) trailerMap[mtID] = "S0Q4gqBUs7c" else trailerMap[mtID] = mt[0].key
+                        }
+
+                        override fun onFailure(call2: Call<MovieTrailerResponse?>, t: Throwable) {}
+                    })
+                }
+                recyclerView!!.adapter = PopularAdapter(movies as List<MovieModel>, R.layout.content_main, context!!)
+                recyclerView!!.adapter!!.notifyDataSetChanged()
+            }
+
+            override fun onFailure(call: Call<MovieResponse?>, t: Throwable) {}
+        })
+    }
+
+    /*private fun filterBy(chipID: Int) {
+        when (chipID) {
+            R.id.chipPopular -> {
+                filterByMostPopular()
+                recyclerView!!.adapter!!.notifyDataSetChanged()
+            }
+            R.id.chipRecent -> {
+                filterByMostRecent()
+                recyclerView!!.adapter!!.notifyDataSetChanged()
+            }
+            R.id.chipRated -> {
+                filterByMostRated()
+                recyclerView!!.adapter!!.notifyDataSetChanged()
+            }
+        }
+    }*/
+
+    private fun filterByMostRecent() {
+        recyclerView!!.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        moviesCopy = movies
+        Collections.sort(movies) { o1, o2 -> o1!!.releaseDate.compareTo(o2!!.releaseDate) }
+        Collections.reverse(movies)
+        recyclerView!!.adapter = PopularAdapter(movies as List<MovieModel>, R.layout.content_main, context!!)
+    }
+
+    private fun filterByMostPopular() {
+        recyclerView!!.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        Collections.sort(movies) { o1, o2 -> o1!!.popularity.compareTo(o2!!.popularity) }
+        Collections.reverse(movies)
+        recyclerView!!.adapter = PopularAdapter(movies as List<MovieModel>, R.layout.content_main, context!!)
+    }
+
+    private fun filterByMostRated() {
+        recyclerView!!.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        Collections.sort(movies) { o1, o2 -> o1!!.voteCount.compareTo(o2!!.voteCount) }
+        Collections.reverse(movies)
+        recyclerView!!.adapter = PopularAdapter(movies as List<MovieModel>, R.layout.content_main, context!!)
+    }
+
+    private fun undoFilter() {
+        movies = moviesCopy
+        recyclerView!!.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        recyclerView!!.adapter = PopularAdapter(movies as List<MovieModel>, R.layout.content_main, context!!)
+        recyclerView!!.adapter!!.notifyDataSetChanged()
+    }
+
+    private fun refreshList() {
+        recyclerView!!.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        recyclerView!!.adapter = PopularAdapter(movies as List<MovieModel>, R.layout.content_main, context!!)
+        recyclerView!!.addOnItemTouchListener(object : OnItemTouchListener {
+            var gestureDetector = GestureDetector(context, object : SimpleOnGestureListener() {
+                override fun onSingleTapUp(e: MotionEvent): Boolean {
+                    return true
+                }
+            })
+
+            override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
+                val child = rv.findChildViewUnder(e.x, e.y)
+                if (child != null && gestureDetector.onTouchEvent(e)) {
+                    val position = rv.getChildAdapterPosition(child)
+                    val i = Intent(context, DetailActivity::class.java)
+                    i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    i.putExtra(DetailActivity.EXTRA_ID, movies!![position]!!.id)
+                    i.putExtra(DetailActivity.EXTRA_TITLE, movies!![position]!!.title)
+                    i.putExtra(DetailActivity.EXTRA_OVERVIEW, movies!![position]!!.overview)
+                    i.putExtra(DetailActivity.EXTRA_TIME, movies!![position]!!.releaseDate)
+                    i.putExtra(DetailActivity.EXTRA_POSTER, movies!![position]!!.posterPath)
+                    i.putExtra(DetailActivity.EXTRA_LANGUAGE, movies!![position]!!.originalLanguage)
+                    i.putExtra(DetailActivity.EXTRA_GENRES, movies!![position]!!.genre)
+                    i.putExtra(DetailActivity.EXTRA_VOTE, movies!![position]!!.getVoteAverage())
+                    i.putExtra(DetailActivity.EXTRA_YTLINK, trailerMap[movies!![position]!!.id])
+                    context!!.startActivity(i)
+                }
+                return false
+            }
+
+            override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {}
+            override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {}
+        })
+    }
+
+    companion object {
+        fun newInstance(param1: String?, param2: String?): PopularFragment {
+            val fragment = PopularFragment()
+            val args = Bundle()
+            fragment.arguments = args
+            return fragment
+        }
+    }
+}
