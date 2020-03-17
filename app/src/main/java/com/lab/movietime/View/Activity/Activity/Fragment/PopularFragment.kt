@@ -1,9 +1,12 @@
 package com.lab.movietime.View.Activity.Activity.Fragment
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import android.view.GestureDetector.SimpleOnGestureListener
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.EditText
 import android.widget.ImageButton
 import androidx.fragment.app.Fragment
@@ -11,7 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnItemTouchListener
 import butterknife.BindView
-import com.google.android.material.chip.Chip
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.lab.movietime.Adapter.PopularAdapter
 import com.lab.movietime.BuildConfig
 import com.lab.movietime.Interface.ApiBuilder.getClient
@@ -21,6 +24,7 @@ import com.lab.movietime.Model.MovieResponse
 import com.lab.movietime.Model.MovieTrailer
 import com.lab.movietime.Model.MovieTrailerResponse
 import com.lab.movietime.R
+import com.lab.movietime.R2.anim.rotate_backward
 import com.lab.movietime.View.Activity.Activity.Activity.DetailActivity
 import com.lab.movietime.values.Values
 import retrofit2.Call
@@ -34,11 +38,32 @@ class PopularFragment : Fragment() {
     private val trailerMap = HashMap<Int, String?>()
     private var movies: List<MovieModel?>? = ArrayList()
     private var moviesCopy: List<MovieModel?>? = ArrayList()
-    private val chipTopRow = arrayOfNulls<Chip>(3)
+    private var isFabOpen: Boolean = false
 
     @JvmField
     @BindView(R.id.rc_view)
     var recyclerView: RecyclerView? = null
+
+    @JvmField
+    @BindView(R.id.fab)
+    var fab: FloatingActionButton? = null
+
+    @JvmField
+    @BindView(R.id.fab1)
+    var fabitem1: FloatingActionButton? = null
+
+    @JvmField
+    @BindView(R.id.fab2)
+    var fabitem2: FloatingActionButton? = null
+
+    @JvmField
+    @BindView(R.id.fab3)
+    var fabitem3: FloatingActionButton? = null
+
+    lateinit var fab_open: Animation
+    lateinit var fab_close: Animation
+    lateinit var rotate_forward: Animation
+    lateinit var rotate_backward: Animation
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.popular_fragment, container, false)
@@ -51,8 +76,73 @@ class PopularFragment : Fragment() {
             } else loadMovie()
         }
 
+        fab_open = AnimationUtils.loadAnimation(context, R.anim.fab_open);
+        fab_close = AnimationUtils.loadAnimation(context,R.anim.fab_close);
+        rotate_forward = AnimationUtils.loadAnimation(context,R.anim.rotate_forward);
+        rotate_backward = AnimationUtils.loadAnimation(context,R.anim.rotate_backward);
+
+
+        fab = view.findViewById(R.id.fab)
+        fabitem1 = view.findViewById(R.id.fab1)
+        fabitem2 = view.findViewById(R.id.fab2)
+        fabitem3 = view.findViewById(R.id.fab3)
+
+        fab!!.setOnClickListener { view ->
+            animateFAB();
+        }
+
+        fabitem1!!.setOnClickListener { view ->
+            filterByMostPopular()
+            closeAnimation()
+        }
+
+        fabitem2!!.setOnClickListener { view ->
+           filterByMostRated()
+            closeAnimation()
+        }
+
+        fabitem3!!.setOnClickListener { view ->
+            filterByMostRecent()
+            closeAnimation()
+        }
+
         if (movies!!.isEmpty()) loadMovie() else refreshList()
         return view
+    }
+
+    private fun animateFAB() {
+        if (!isFabOpen) openAnimation()
+        else closeAnimation()
+    }
+
+    @SuppressLint("RestrictedApi")
+    private fun openAnimation() {
+        fab!!.startAnimation(rotate_forward);
+        fabitem1!!.startAnimation(fab_open);
+        fabitem2!!.startAnimation(fab_open);
+        fabitem3!!.startAnimation(fab_open);
+        fabitem1!!.visibility = View.VISIBLE
+        fabitem2!!.visibility = View.VISIBLE
+        fabitem3!!.visibility = View.VISIBLE
+        fabitem1!!.isClickable = true;
+        fabitem2!!.isClickable = true;
+        fabitem3!!.isClickable = true;
+        isFabOpen = true;
+    }
+
+    @SuppressLint("RestrictedApi")
+    private fun closeAnimation() {
+        fab!!.startAnimation(rotate_backward);
+        fabitem1!!.startAnimation(fab_close);
+        fabitem2!!.startAnimation(fab_close);
+        fabitem3!!.startAnimation(fab_close);
+        fabitem1!!.visibility = View.INVISIBLE
+        fabitem2!!.visibility = View.INVISIBLE
+        fabitem3!!.visibility = View.INVISIBLE
+        fabitem1!!.isClickable = false;
+        fabitem2!!.isClickable = false;
+        fabitem3!!.isClickable = false;
+        isFabOpen = false;
     }
 
     private fun loadMovie() {
@@ -139,29 +229,13 @@ class PopularFragment : Fragment() {
         })
     }
 
-    /*private fun filterBy(chipID: Int) {
-        when (chipID) {
-            R.id.chipPopular -> {
-                filterByMostPopular()
-                recyclerView!!.adapter!!.notifyDataSetChanged()
-            }
-            R.id.chipRecent -> {
-                filterByMostRecent()
-                recyclerView!!.adapter!!.notifyDataSetChanged()
-            }
-            R.id.chipRated -> {
-                filterByMostRated()
-                recyclerView!!.adapter!!.notifyDataSetChanged()
-            }
-        }
-    }*/
-
     private fun filterByMostRecent() {
         recyclerView!!.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         moviesCopy = movies
         Collections.sort(movies) { o1, o2 -> o1!!.releaseDate.compareTo(o2!!.releaseDate) }
         Collections.reverse(movies)
         recyclerView!!.adapter = PopularAdapter(movies as List<MovieModel>, R.layout.content_main, context!!)
+        recyclerView!!.adapter!!.notifyDataSetChanged()
     }
 
     private fun filterByMostPopular() {
@@ -169,6 +243,7 @@ class PopularFragment : Fragment() {
         Collections.sort(movies) { o1, o2 -> o1!!.popularity.compareTo(o2!!.popularity) }
         Collections.reverse(movies)
         recyclerView!!.adapter = PopularAdapter(movies as List<MovieModel>, R.layout.content_main, context!!)
+        recyclerView!!.adapter!!.notifyDataSetChanged()
     }
 
     private fun filterByMostRated() {
@@ -176,6 +251,7 @@ class PopularFragment : Fragment() {
         Collections.sort(movies) { o1, o2 -> o1!!.voteCount.compareTo(o2!!.voteCount) }
         Collections.reverse(movies)
         recyclerView!!.adapter = PopularAdapter(movies as List<MovieModel>, R.layout.content_main, context!!)
+        recyclerView!!.adapter!!.notifyDataSetChanged()
     }
 
     private fun undoFilter() {
