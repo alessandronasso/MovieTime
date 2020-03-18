@@ -23,12 +23,15 @@ import com.lab.movietime.Model.MovieResponse
 import com.lab.movietime.Model.MovieTrailer
 import com.lab.movietime.Model.MovieTrailerResponse
 import com.lab.movietime.R
-import com.lab.movietime.R2.anim.rotate_backward
 import com.lab.movietime.View.Activity.Activity.Activity.DetailActivity
 import com.lab.movietime.values.Values
+import com.lab.movietime.values.Values.INVERSE_MAP
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.lang.Integer.parseInt
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 class PopularFragment : Fragment() {
@@ -71,6 +74,18 @@ class PopularFragment : Fragment() {
     @BindView(R.id.spinnerGenre)
     var spinnerGenre: Spinner? = null
 
+    @JvmField
+    @BindView(R.id.spinnerVote)
+    var spinnerVote: Spinner? = null
+
+    @JvmField
+    @BindView(R.id.spinnerOperator)
+    var spinnerOperator: Spinner? = null
+
+    @JvmField
+    @BindView(R.id.releaseYear)
+    var releaseYear: EditText? = null
+
     lateinit var fab_open: Animation
     lateinit var fab_close: Animation
     lateinit var rotate_forward: Animation
@@ -81,19 +96,23 @@ class PopularFragment : Fragment() {
         recyclerView = view.findViewById(R.id.popular_rc_view) as RecyclerView
         mSearchField = view.findViewById<View>(R.id.search_field) as EditText
         mSearchBtn = view.findViewById<View>(R.id.search_btn) as ImageButton
-        mSearchBtn!!.setOnClickListener {
-            if (mSearchField!!.text.toString() != "") {
-                //spinner.selectedItem.toString()
-                searchMovie(mSearchField!!.text.toString())
-            } else loadMovie()
-        }
-
         checkbox = view.findViewById(R.id.checkbox_adv) as CheckBox
         hiddenTab = view.findViewById(R.id.hiddenTab) as LinearLayout
+        spinnerGenre = view.findViewById(R.id.spinnerGenre) as Spinner
+        spinnerVote = view.findViewById(R.id.spinnerVote) as Spinner
+        spinnerOperator = view.findViewById(R.id.spinnerOperator) as Spinner
+        releaseYear = view.findViewById(R.id.releaseYear) as EditText
 
         checkbox!!.setOnCheckedChangeListener { buttonView, isChecked ->
             if (isChecked) hiddenTab!!.visibility = View.VISIBLE
             else hiddenTab!!.visibility = View.GONE
+        }
+
+        mSearchBtn!!.setOnClickListener {
+            if (mSearchField!!.text.toString() != "") {
+                searchMovie(mSearchField!!.text.toString())
+
+            } else loadMovie()
         }
 
         fab_open = AnimationUtils.loadAnimation(context, R.anim.fab_open);
@@ -128,6 +147,46 @@ class PopularFragment : Fragment() {
 
         if (movies!!.isEmpty()) loadMovie() else refreshList()
         return view
+    }
+
+    private fun removeGenres(genreSelected: String) {
+        var selectedSeries: MutableList<MovieModel?>? = ArrayList()
+        for (i in movies!!.indices) {
+            System.out.println(movies!!.get(i)!!.genreIds.contains(INVERSE_MAP.get(genreSelected)))
+            if (movies!!.get(i)!!.genreIds.contains(INVERSE_MAP.get(genreSelected)))
+                selectedSeries!!.add(movies!!.get(i))
+        }
+        movies = null
+        movies = selectedSeries as List<MovieModel?>
+    }
+
+    private fun removeYear(year: Int) {
+        var selectedSeries: MutableList<MovieModel?>? = ArrayList()
+        for (i in movies!!.indices) {
+            var s = movies!!.get(i)!!.releaseDate.substring(0,4)
+            if (s.toInt()==year)
+                selectedSeries!!.add(movies!!.get(i))
+        }
+        movies = null
+        movies = selectedSeries as List<MovieModel?>
+    }
+
+    private fun removeVote(vote: Int, operator: String) {
+        var selectedSeries: MutableList<MovieModel?>? = ArrayList()
+        for (i in movies!!.indices) {
+            if (operator.equals(">")) {
+                if (movies!!.get(i)!!.getVoteAverage() >= vote)
+                    selectedSeries!!.add(movies!!.get(i))
+            } else if (operator.equals("<")) {
+                if (movies!!.get(i)!!.getVoteAverage() < vote)
+                    selectedSeries!!.add(movies!!.get(i))
+            } else if (operator.equals("=")) {
+                if (movies!!.get(i)!!.getVoteAverage() == vote.toDouble())
+                    selectedSeries!!.add(movies!!.get(i))
+            }
+        }
+        movies = null
+        movies = selectedSeries as List<MovieModel?>
     }
 
     private fun animateFAB() {
@@ -241,6 +300,22 @@ class PopularFragment : Fragment() {
                         override fun onFailure(call2: Call<MovieTrailerResponse?>, t: Throwable) {}
                     })
                 }
+
+                if (checkbox!!.isChecked) {
+                    if (spinnerGenre!!.selectedItem.toString()!="---")
+                        removeGenres(spinnerGenre!!.selectedItem.toString())
+                    if (releaseYear!!.text.toString().trim().length>0) {
+                        var numeric = true
+                        var num = 0
+                        try { num = parseInt(releaseYear!!.text.toString())
+                        } catch (e: NumberFormatException) { numeric = false }
+                        if (numeric && num>1850 && num<2030)
+                            removeYear(num)
+                    }
+                    if (spinnerVote!!.selectedItem.toString()!="---")
+                        removeVote(spinnerVote!!.selectedItem.toString().toInt(), spinnerOperator!!.selectedItem.toString())
+                }
+
                 recyclerView!!.adapter = PopularAdapter(movies as List<MovieModel>, R.layout.content_main, context!!)
                 recyclerView!!.adapter!!.notifyDataSetChanged()
             }

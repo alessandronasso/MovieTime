@@ -145,7 +145,7 @@
             android:layout_below="@+id/spinner"
             android:layout_margin="10dp"
             android:hint="Insert year..."
-            android:textColor="@color/colorPrimary" />
+            android:textColor="@color/design_default_color_on_secondary" />
     </LinearLayout>
 
         <!-- END OF LINE 2 -->

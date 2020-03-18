@@ -1,7 +1,5 @@
 package com.lab.movietime.values
 
-import java.util.*
-
 object Values {
     var baseURL = "https://api.myjson.com/bins/"
     @JvmField
@@ -19,10 +17,16 @@ object Values {
     @JvmField
     var SORT_BY = arrayOf("popularity.desc", "popularity.asc", "Fantasy")
     @JvmField
+    var INVERSE_MAP:HashMap<String,Int> = HashMap<String,Int>()
+    @JvmField
     var MAP_NAME: HashMap<Int, String> = initializeMap()
+
     private fun initializeMap(): HashMap<Int, String> {
         val tmp = HashMap<Int, String>()
         for (i in GENRE.indices) tmp[GENRE[i]] = GENRE_BY_NAME[i]
+        for ((key, value) in tmp) {
+            INVERSE_MAP.put(value, key)
+        }
         return tmp
     }
 }
