@@ -1,130 +1,289 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/linearLayout2"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <TextView
-        android:layout_width="match_parent"
+        android:id="@+id/textView2"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="49dp"
+        android:layout_marginLeft="49dp"
+        android:layout_marginEnd="49dp"
+        android:layout_marginRight="49dp"
         android:text="Search"
-        android:layout_marginLeft="@dimen/_25sdp"
-        android:layout_marginRight="@dimen/_25sdp"
+        android:textColor="#ffffff"
         android:textSize="@dimen/_20ssp"
         android:textStyle="bold"
-        android:textColor="#ffffff"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
+
+    <EditText
+        android:id="@+id/search_field"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/layoutSearchBar"
-        android:layout_gravity="center">
+        android:layout_marginStart="1dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/search_layout"
+        android:ems="10"
+        android:fontFamily="@font/nunito_bold"
+        android:hint="Search here"
+        android:inputType="textPersonName"
+        android:paddingLeft="20dp"
+        android:paddingTop="10dp"
+        android:paddingRight="20dp"
+        android:paddingBottom="10dp"
+        android:textColor="@color/colorPrimary"
+        android:textColorHint="@color/colorPrimary"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toStartOf="@id/search_btn"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="@id/textView2"
+        app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
-        <EditText
-            android:id="@+id/search_field"
+    <ImageButton
+        android:id="@+id/search_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@color/cardview_shadow_end_color"
+        android:paddingTop="17dp"
+        app:layout_constraintBottom_toTopOf="@id/checkbox_adv"
+        app:layout_constraintEnd_toEndOf="@id/textView2"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@+id/search_field"
+        app:layout_constraintTop_toBottomOf="@+id/textView2"
+        app:srcCompat="@mipmap/search_button" />
+
+
+    <CheckBox
+        android:id="@+id/checkbox_adv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Advanced search"
+        android:layout_marginEnd="@dimen/_30sdp"
+        android:textColor="@color/colorPrimary"
+        app:layout_constraintBottom_toTopOf="@id/hiddenTab"
+        app:layout_constraintEnd_toEndOf="@+id/search_btn"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="@+id/search_field"
+        app:layout_constraintTop_toBottomOf="@+id/search_field" />
+
+    <LinearLayout
+        android:background="@layout/rounded_border_linearlayout"
+        android:id="@+id/hiddenTab"
+        android:paddingTop="@dimen/_10sdp"
+        android:paddingBottom="@dimen/_10sdp"
+        android:paddingRight="@dimen/_10sdp"
+        android:paddingLeft="@dimen/_10sdp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:layout_marginTop="@dimen/_7sdp"
+        app:layout_constraintBottom_toTopOf="@id/popular_rc_view"
+        app:layout_constraintEnd_toEndOf="@id/search_btn"
+        app:layout_constraintStart_toStartOf="@id/search_field"
+        app:layout_constraintTop_toBottomOf="@+id/checkbox_adv"
+        tools:visibility="visible">
+
+        <!-- LINE 1 -->
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="20dp"
-            android:layout_marginTop="20dp"
-            android:layout_toStartOf="@+id/search_btn"
-            android:background="@drawable/search_layout"
-            android:ems="10"
-            android:fontFamily="@font/nunito_bold"
-            android:hint="Search here"
-            android:textColorHint="@color/colorPrimary"
-            android:inputType="textPersonName"
-            android:paddingBottom="10dp"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
-            android:paddingTop="10dp"
-            android:textColor="@color/colorPrimary"
-            android:textSize="16sp" />
+            android:layout_height="wrap_content">
 
-        <ImageButton
-            android:id="@+id/search_btn"
+        <TextView
+            android:id="@+id/textGenre"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:paddingTop="17dp"
-            android:layout_alignTop="@+id/search_field"
-            android:background="@color/cardview_shadow_end_color"
-            app:srcCompat="@mipmap/search_button" />
+            android:text="Genre:"
+            android:textColor="@color/colorPrimary"
+            android:textAlignment="gravity" />
+
+        <Spinner
+            android:id="@+id/spinnerGenre"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/spinner_background"
+            android:layout_below="@+id/spinner"
+            android:layout_margin="10dp"
+            android:textColor="@color/colorPrimary"
+            android:entries="@array/genre_list" />
     </LinearLayout>
 
-    <RelativeLayout
-        android:layout_below="@+id/layoutSearchBar"
-        android:layout_width="match_parent"
+        <!-- END OF LINE 1 -->
+
+        <!-- LINE 2 -->
+    <LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:minHeight="@dimen/_150sdp"
-        android:layout_marginTop="@dimen/_10sdp"
-        android:orientation="vertical">
-        <androidx.recyclerview.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:id="@+id/popular_rc_view">
-        </androidx.recyclerview.widget.RecyclerView>
+        android:layout_gravity="center">
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab3"
+        <TextView
+            android:id="@+id/textYear"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/_9sdp"
-            android:layout_gravity="bottom|end"
-            android:layout_marginRight="16dp"
-            android:layout_above="@id/fab2"
-            android:layout_alignParentRight="true"
-            android:visibility="invisible"
-            app:backgroundTint="@color/colorFabIcon"
-            app:elevation="6dp"
-            app:pressedTranslationZ="12dp"
-            android:scaleType="center"
-            android:src="@drawable/recent_icon" />
+            android:layout_gravity="center"
+            android:text="Release:"
+            android:layout_below="@+id/genresTextView"
+            android:textColor="@color/colorPrimary"
+            android:textAlignment="gravity" />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab2"
+        <EditText
+            android:background="@drawable/spinner_background"
+            android:id="@+id/releaseYear"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/_9sdp"
-            android:layout_gravity="bottom|end"
-            android:layout_marginRight="16dp"
-            android:layout_above="@id/fab1"
-            android:layout_alignParentRight="true"
-            android:visibility="invisible"
-            app:backgroundTint="@color/colorFabIcon"
-            app:elevation="6dp"
-            android:scaleType="center"
-            app:pressedTranslationZ="12dp"
-            android:src="@drawable/rated_icon" />
+            android:layout_below="@+id/spinner"
+            android:layout_margin="10dp"
+            android:hint="Insert year..."
+            android:textColor="@color/colorPrimary" />
+    </LinearLayout>
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab1"
+        <!-- END OF LINE 2 -->
+
+        <!-- LINE 3 -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/textVote"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_above="@id/fab"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="16dp"
-            android:src="@drawable/pop_icon"
-            android:visibility="invisible"
-            app:backgroundTint="@color/colorFabIcon"
-            app:elevation="6dp"
-            android:scaleType="center"
-            app:pressedTranslationZ="12dp" />
+            android:layout_gravity="center"
+            android:text="Rating:"
+            android:layout_below="@+id/genresTextView"
+            android:textColor="@color/colorPrimary"
+            android:textAlignment="gravity" />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab"
+        <Spinner
+            android:id="@+id/spinnerOperator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:elevation="6dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            app:backgroundTint="@color/colorPrimary"
-            app:pressedTranslationZ="12dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginBottom= "16dp"
-            android:scaleType="centerInside"
-            android:src="@drawable/filter" />
-    </RelativeLayout>
+            android:background="@drawable/spinner_background"
+            android:layout_below="@+id/spinner"
+            android:layout_margin="10dp"
+            android:textColor="@color/colorPrimary"
+            android:entries="@array/operator_list" />
 
-</LinearLayout>
+        <Spinner
+            android:id="@+id/spinnerVote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/spinner"
+            android:background="@drawable/spinner_background"
+            android:layout_margin="10dp"
+            android:textColor="@color/colorPrimary"
+            android:entries="@array/vote_list" />
+
+        <!-- END OF LINE 3 -->
+    </LinearLayout>
+
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/popular_rc_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/hiddenTab" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="16dp"
+        android:scaleType="center"
+        android:src="@drawable/recent_icon"
+        android:text="Most Recent"
+        android:visibility="invisible"
+        app:backgroundTint="@color/design_default_color_on_primary"
+        app:elevation="6dp"
+        app:layout_constraintBottom_toTopOf="@+id/fab2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1"
+        app:maxImageSize="35dp"
+        app:pressedTranslationZ="12dp" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="16dp"
+        android:scaleType="center"
+        android:src="@drawable/rated_icon"
+        android:text="Most Rated"
+        android:visibility="invisible"
+        app:backgroundTint="@color/design_default_color_background"
+        app:elevation="6dp"
+        app:layout_constraintBottom_toTopOf="@+id/fab1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1"
+        app:maxImageSize="35dp"
+        app:pressedTranslationZ="12dp" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:scaleType="center"
+        android:src="@drawable/pop_icon"
+        android:text="Most Popular"
+        android:visibility="invisible"
+        app:backgroundTint="@color/design_default_color_background"
+        app:elevation="6dp"
+        app:layout_constraintBottom_toTopOf="@+id/fab"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1"
+        app:maxImageSize="35dp"
+        app:pressedTranslationZ="12dp" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="20dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/filter"
+        app:backgroundTint="@color/colorPrimary"
+        app:elevation="6dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1"
+        app:maxImageSize="35dp"
+        app:pressedTranslationZ="12dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

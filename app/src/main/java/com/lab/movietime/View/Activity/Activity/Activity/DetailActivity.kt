@@ -15,6 +15,7 @@ import com.lab.movietime.BuildConfig
 import com.lab.movietime.Interface.ApiBuilder.getClient
 import com.lab.movietime.Interface.ApiService
 import com.lab.movietime.Interface.DBHandler
+import com.lab.movietime.Listener.OnSwipeTouchListener
 import com.lab.movietime.Model.LanguageModel
 import com.lab.movietime.R
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
@@ -80,7 +81,14 @@ class DetailActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.detail_activity)
-        //addGestures()
+        window.decorView.setOnTouchListener(object: OnSwipeTouchListener(this@DetailActivity) {
+            override fun onSwipeLeft() {
+                onBackPressed()
+            }
+            override fun onSwipeRight() {
+                onBackPressed()
+            }
+        })
         hideNavigationBar()
         initializeMapLang()
         val apiService = getClient(this@DetailActivity)!!.create(ApiService::class.java)

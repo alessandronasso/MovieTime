@@ -85,8 +85,4 @@ dependencies {
     //Youtube player + chromecast sender
     implementation 'com.pierfrancescosoffritti.androidyoutubeplayer:core:10.0.5'
     implementation 'com.pierfrancescosoffritti.androidyoutubeplayer:chromecast-sender:0.23'
-
-    //Floating Action Bar
-    implementation 'com.robertlevonyan.view:CustomFloatingActionButton:3.0.0'
-    implementation 'com.github.clans:fab:1.6.4'
 }

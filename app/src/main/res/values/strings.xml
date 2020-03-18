@@ -1,4 +1,31 @@
 <resources>
     <string name="app_name">MovieTime</string>
     <string name="appname">MovieTime</string>
+
+    <string-array name="genre_list">
+        <item>  ---</item>
+        <item>Action</item>
+        <item>Adventure</item>
+        <item>Animation</item>
+        <item>Comedy</item>
+        <item>Drama</item>
+        <item>Fantasy</item>
+        <item>Horror</item>
+        <item>Thriller</item>
+    </string-array>
+
+    <string-array name="vote_list">
+        <item>  ---  </item>
+        <item>    1    </item>
+        <item>    2    </item>
+        <item>    3    </item>
+        <item>    4    </item>
+        <item>    5    </item>
+    </string-array>
+
+    <string-array name="operator_list">
+        <item> > </item>
+        <item> --- </item>
+        <item> = </item>
+    </string-array>
 </resources>

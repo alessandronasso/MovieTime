@@ -7,8 +7,7 @@ import android.view.*
 import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
-import android.widget.EditText
-import android.widget.ImageButton
+import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -60,6 +59,18 @@ class PopularFragment : Fragment() {
     @BindView(R.id.fab3)
     var fabitem3: FloatingActionButton? = null
 
+    @JvmField
+    @BindView(R.id.checkbox_adv)
+    var checkbox: CheckBox? = null
+
+    @JvmField
+    @BindView(R.id.hiddenTab)
+    var hiddenTab: LinearLayout? = null
+
+    @JvmField
+    @BindView(R.id.spinnerGenre)
+    var spinnerGenre: Spinner? = null
+
     lateinit var fab_open: Animation
     lateinit var fab_close: Animation
     lateinit var rotate_forward: Animation
@@ -72,8 +83,17 @@ class PopularFragment : Fragment() {
         mSearchBtn = view.findViewById<View>(R.id.search_btn) as ImageButton
         mSearchBtn!!.setOnClickListener {
             if (mSearchField!!.text.toString() != "") {
+                //spinner.selectedItem.toString()
                 searchMovie(mSearchField!!.text.toString())
             } else loadMovie()
+        }
+
+        checkbox = view.findViewById(R.id.checkbox_adv) as CheckBox
+        hiddenTab = view.findViewById(R.id.hiddenTab) as LinearLayout
+
+        checkbox!!.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked) hiddenTab!!.visibility = View.VISIBLE
+            else hiddenTab!!.visibility = View.GONE
         }
 
         fab_open = AnimationUtils.loadAnimation(context, R.anim.fab_open);
