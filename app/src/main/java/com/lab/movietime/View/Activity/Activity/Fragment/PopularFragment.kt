@@ -109,10 +109,7 @@ class PopularFragment : Fragment() {
         }
 
         mSearchBtn!!.setOnClickListener {
-            if (mSearchField!!.text.toString() != "") {
-                searchMovie(mSearchField!!.text.toString())
-
-            } else loadMovie()
+            searchMovie(mSearchField!!.text.toString())
         }
 
         fab_open = AnimationUtils.loadAnimation(context, R.anim.fab_open);
@@ -152,7 +149,6 @@ class PopularFragment : Fragment() {
     private fun removeGenres(genreSelected: String) {
         var selectedSeries: MutableList<MovieModel?>? = ArrayList()
         for (i in movies!!.indices) {
-            System.out.println(movies!!.get(i)!!.genreIds.contains(INVERSE_MAP.get(genreSelected)))
             if (movies!!.get(i)!!.genreIds.contains(INVERSE_MAP.get(genreSelected)))
                 selectedSeries!!.add(movies!!.get(i))
         }
@@ -281,9 +277,26 @@ class PopularFragment : Fragment() {
     }
 
     private fun searchMovie(movieName: String) {
+        val rand = Random(System.currentTimeMillis())
         val apiService = getClient(context)!!.create(ApiService::class.java)
         recyclerView!!.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        val call = apiService.getItemSearch(movieName)
+        //DEFINING THE CALL
+        var call = apiService.getItemSearch("")
+        if (mSearchField!!.text.toString().equals("")) {
+            var numeric = true
+            var num = 0
+            if (releaseYear!!.text.toString().trim().length>0) {
+                try { num = parseInt(releaseYear!!.text.toString())
+                } catch (e: NumberFormatException) { numeric = false }
+            }
+            if (spinnerGenre!!.selectedItem.toString()!="---" && numeric && num>1850 && num<2030)
+                call = apiService.getGenreYear(BuildConfig.API_KEY, Values.LANGUAGE, false, num!!, INVERSE_MAP.get(spinnerGenre!!.selectedItem.toString())!!, Values.PAGE[rand.nextInt(5)])
+            else if (numeric && num>1850 && num<2030)
+                call = apiService.getYear(BuildConfig.API_KEY, Values.LANGUAGE, false, num, Values.PAGE[rand.nextInt(5)])
+            else if (spinnerGenre!!.selectedItem.toString()!="---")
+                call = apiService.getGenre(BuildConfig.API_KEY, Values.LANGUAGE, false, INVERSE_MAP.get(spinnerGenre!!.selectedItem.toString())!!, Values.PAGE[rand.nextInt(5)])
+        } else call = apiService.getItemSearch(movieName)
+        // END DEF
         call!!.enqueue(object : Callback<MovieResponse?> {
             override fun onResponse(call: Call<MovieResponse?>, response: Response<MovieResponse?>) {
                 movies = response.body()!!.results

@@ -30,6 +30,31 @@ interface ApiService {
             @Query("with_genres") genre: Int,
             @Query("page") page: Int): Call<MovieResponse?>?
 
+    @GET("discover/movie")
+    fun getGenre(
+            @Query("api_key") apiKey: String?,
+            @Query("language") language: String?,
+            @Query("include_adult") adult: Boolean?,
+            @Query("with_genres") genre: Int,
+            @Query("page") page: Int): Call<MovieResponse?>?
+
+    @GET("discover/movie")
+    fun getGenreYear(
+            @Query("api_key") apiKey: String?,
+            @Query("language") language: String?,
+            @Query("include_adult") adult: Boolean?,
+            @Query("year") year: Int,
+            @Query("with_genres") genre: Int,
+            @Query("page") page: Int): Call<MovieResponse?>?
+
+    @GET("discover/movie")
+    fun getYear(
+            @Query("api_key") apiKey: String?,
+            @Query("language") language: String?,
+            @Query("include_adult") adult: Boolean?,
+            @Query("year") year: Int,
+            @Query("page") page: Int): Call<MovieResponse?>?
+
     @GET("configuration/languages")
     fun getLanguages(
             @Query("api_key") apiKey: String?): Call<List<LanguageModel?>?>?
