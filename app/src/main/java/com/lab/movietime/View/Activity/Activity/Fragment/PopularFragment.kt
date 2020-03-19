@@ -299,51 +299,57 @@ class PopularFragment : Fragment() {
                 } catch (e: NumberFormatException) { numeric = false }
             }
             if (spinnerGenre!!.selectedItem.toString()!="---" && numeric && num>1850 && num<2030)
-                call = apiService.getGenreYear(BuildConfig.API_KEY, Values.LANGUAGE, false, num!!, INVERSE_MAP.get(spinnerGenre!!.selectedItem.toString())!!, Values.PAGE[rand.nextInt(5)])
+                call = apiService.getGenreYear(BuildConfig.API_KEY, Values.LANGUAGE, false, num, INVERSE_MAP.get(spinnerGenre!!.selectedItem.toString())!!, Values.PAGE[rand.nextInt(5)])
             else if (numeric && num>1850 && num<2030)
                 call = apiService.getYear(BuildConfig.API_KEY, Values.LANGUAGE, false, num, Values.PAGE[rand.nextInt(5)])
             else if (spinnerGenre!!.selectedItem.toString()!="---")
                 call = apiService.getGenre(BuildConfig.API_KEY, Values.LANGUAGE, false, INVERSE_MAP.get(spinnerGenre!!.selectedItem.toString())!!, Values.PAGE[rand.nextInt(5)])
+            else call = null
         } else call = apiService.getItemSearch(movieName)
         // END DEF
-        call!!.enqueue(object : Callback<MovieResponse?> {
-            override fun onResponse(call: Call<MovieResponse?>, response: Response<MovieResponse?>) {
-                movies = response.body()!!.results
-                moviesCopy = movies
-                for (i in movies!!.indices) {
-                    val callT = apiService.getMovieTrailer(movies!![i]!!.id, BuildConfig.API_KEY)
-                    callT!!.enqueue(object : Callback<MovieTrailerResponse?> {
-                        override fun onResponse(call2: Call<MovieTrailerResponse?>, response2: Response<MovieTrailerResponse?>) {
-                            val mt: List<MovieTrailer>? = response2.body()!!.results
-                            val mtID = response2.body()!!.id
-                            if (mt!!.isEmpty()) trailerMap[mtID] = "S0Q4gqBUs7c" else trailerMap[mtID] = mt[0].key
-                        }
+        if (call!=null) {
+            call!!.enqueue(object : Callback<MovieResponse?> {
+                override fun onResponse(call: Call<MovieResponse?>, response: Response<MovieResponse?>) {
+                    movies = response.body()!!.results
+                    moviesCopy = movies
+                    for (i in movies!!.indices) {
+                        val callT = apiService.getMovieTrailer(movies!![i]!!.id, BuildConfig.API_KEY)
+                        callT!!.enqueue(object : Callback<MovieTrailerResponse?> {
+                            override fun onResponse(call2: Call<MovieTrailerResponse?>, response2: Response<MovieTrailerResponse?>) {
+                                val mt: List<MovieTrailer>? = response2.body()!!.results
+                                val mtID = response2.body()!!.id
+                                if (mt!!.isEmpty()) trailerMap[mtID] = "S0Q4gqBUs7c" else trailerMap[mtID] = mt[0].key
+                            }
 
-                        override fun onFailure(call2: Call<MovieTrailerResponse?>, t: Throwable) {}
-                    })
-                }
-
-                if (checkbox!!.isChecked) {
-                    if (spinnerGenre!!.selectedItem.toString()!="---")
-                        removeGenres(spinnerGenre!!.selectedItem.toString())
-                    if (releaseYear!!.text.toString().trim().length>0) {
-                        var numeric = true
-                        var num = 0
-                        try { num = parseInt(releaseYear!!.text.toString())
-                        } catch (e: NumberFormatException) { numeric = false }
-                        if (numeric && num>1850 && num<2030)
-                            removeYear(num)
+                            override fun onFailure(call2: Call<MovieTrailerResponse?>, t: Throwable) {}
+                        })
                     }
-                    if (spinnerVote!!.selectedItem.toString()!="---")
-                        removeVote(spinnerVote!!.selectedItem.toString().toInt(), spinnerOperator!!.selectedItem.toString())
+
+                    if (checkbox!!.isChecked) {
+                        if (spinnerGenre!!.selectedItem.toString() != "---")
+                            removeGenres(spinnerGenre!!.selectedItem.toString())
+                        if (releaseYear!!.text.toString().trim().length > 0) {
+                            var numeric = true
+                            var num = 0
+                            try {
+                                num = parseInt(releaseYear!!.text.toString())
+                            } catch (e: NumberFormatException) {
+                                numeric = false
+                            }
+                            if (numeric && num > 1850 && num < 2030)
+                                removeYear(num)
+                        }
+                        if (spinnerVote!!.selectedItem.toString() != "---")
+                            removeVote(spinnerVote!!.selectedItem.toString().toInt(), spinnerOperator!!.selectedItem.toString())
+                    }
+
+                    recyclerView!!.adapter = PopularAdapter(movies as List<MovieModel>, R.layout.content_main, context!!)
+                    recyclerView!!.adapter!!.notifyDataSetChanged()
                 }
 
-                recyclerView!!.adapter = PopularAdapter(movies as List<MovieModel>, R.layout.content_main, context!!)
-                recyclerView!!.adapter!!.notifyDataSetChanged()
-            }
-
-            override fun onFailure(call: Call<MovieResponse?>, t: Throwable) {}
-        })
+                override fun onFailure(call: Call<MovieResponse?>, t: Throwable) {}
+            })
+        } else DynamicToast.makeError(activity!!.applicationContext, "Filters incorrect!", 2000).show();
     }
 
     private fun filterByMostRecent() {

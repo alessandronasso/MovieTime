@@ -85,8 +85,9 @@ class HomeFragment : Fragment() {
         for (j in 0 until NUM_ROWS) {
             call[j]!!.enqueue(object : Callback<MovieResponse?> {
                 override fun onResponse(call: Call<MovieResponse?>, response: Response<MovieResponse?>) {
-                    val movies = response.body()!!.results
+                    var movies = response.body()!!.results
                     movieList.add(movies!!)
+                    movies = removeEmptyMovies(movies)
                     for (i in movies!!.indices) {
                         val callT = apiService.getMovieTrailer(movies[i].id, BuildConfig.API_KEY)
                         callT!!.enqueue(object : Callback<MovieTrailerResponse?> {
@@ -214,6 +215,15 @@ class HomeFragment : Fragment() {
                 override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {}
             })
         }
+    }
+
+    private fun removeEmptyMovies (movies: List<MovieModel>?): List<MovieModel>? {
+        val selectedSeries: MutableList<MovieModel?>? = ArrayList()
+        for (i in movies!!.indices) {
+            if (!(movies!!.get(i)!!.backdropPath==null || movies!!.get(i)!!.posterPath==null))
+                selectedSeries!!.add(movies!!.get(i))
+        }
+        return selectedSeries as List<MovieModel>?
     }
 
     companion object {

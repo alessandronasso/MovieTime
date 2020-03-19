@@ -21,6 +21,7 @@ import com.lab.movietime.R
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
+import kotlinx.android.synthetic.main.detail_activity.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -81,7 +82,7 @@ class DetailActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.detail_activity)
-        window.decorView.setOnTouchListener(object: OnSwipeTouchListener(this@DetailActivity) {
+        detail_activity.setOnTouchListener(object: OnSwipeTouchListener(this@DetailActivity) {
             override fun onSwipeLeft() {
                 onBackPressed()
             }
