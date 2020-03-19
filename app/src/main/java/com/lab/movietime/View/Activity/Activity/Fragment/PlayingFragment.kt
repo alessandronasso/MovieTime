@@ -1,6 +1,9 @@
 package com.lab.movietime.View.Activity.Activity.Fragment
 
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.os.Bundle
 import android.util.Pair
 import android.view.*
@@ -21,6 +24,7 @@ import com.lab.movietime.Model.MovieTrailer
 import com.lab.movietime.Model.MovieTrailerResponse
 import com.lab.movietime.R
 import com.lab.movietime.View.Activity.Activity.Activity.DetailActivity
+import com.pranavpandey.android.dynamic.toasts.DynamicToast
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -50,11 +54,6 @@ class PlayingFragment : Fragment() {
         recyclerView = view.findViewById(R.id.playing_rc_view)
         movies = ArrayList()
         loadMovie()
-        /*if (recyclerView.getAdapter() != null) {
-            activity!!.supportFragmentManager.beginTransaction()
-                    .replace(R.id.fragment_container, PlayingFragment())
-                    .commit()
-        }*/
         return view
     }
 
@@ -103,22 +102,24 @@ class PlayingFragment : Fragment() {
             })
 
             override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
-                val child = rv.findChildViewUnder(e.x, e.y)
-                if (child != null && gestureDetector.onTouchEvent(e)) {
-                    val position = rv.getChildAdapterPosition(child)
-                    val i = Intent(context, DetailActivity::class.java)
-                    i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    i.putExtra(DetailActivity.EXTRA_ID, movies[position].id)
-                    i.putExtra(DetailActivity.EXTRA_TITLE, movies[position].title)
-                    i.putExtra(DetailActivity.EXTRA_OVERVIEW, movies[position].overview)
-                    i.putExtra(DetailActivity.EXTRA_TIME, movies[position].releaseDate)
-                    i.putExtra(DetailActivity.EXTRA_POSTER, movies[position].posterPath)
-                    i.putExtra(DetailActivity.EXTRA_LANGUAGE, movies[position].originalLanguage)
-                    i.putExtra(DetailActivity.EXTRA_GENRES, movies[position].genre)
-                    i.putExtra(DetailActivity.EXTRA_VOTE, movies[position].getVoteAverage())
-                    i.putExtra(DetailActivity.EXTRA_YTLINK, trailerMap[movies[position].id])
-                    context!!.startActivity(i)
-                }
+                if (isNetworkAvailable) {
+                    val child = rv.findChildViewUnder(e.x, e.y)
+                    if (child != null && gestureDetector.onTouchEvent(e)) {
+                        val position = rv.getChildAdapterPosition(child)
+                        val i = Intent(context, DetailActivity::class.java)
+                        i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        i.putExtra(DetailActivity.EXTRA_ID, movies[position].id)
+                        i.putExtra(DetailActivity.EXTRA_TITLE, movies[position].title)
+                        i.putExtra(DetailActivity.EXTRA_OVERVIEW, movies[position].overview)
+                        i.putExtra(DetailActivity.EXTRA_TIME, movies[position].releaseDate)
+                        i.putExtra(DetailActivity.EXTRA_POSTER, movies[position].posterPath)
+                        i.putExtra(DetailActivity.EXTRA_LANGUAGE, movies[position].originalLanguage)
+                        i.putExtra(DetailActivity.EXTRA_GENRES, movies[position].genre)
+                        i.putExtra(DetailActivity.EXTRA_VOTE, movies[position].getVoteAverage())
+                        i.putExtra(DetailActivity.EXTRA_YTLINK, trailerMap[movies[position].id])
+                        context!!.startActivity(i)
+                    }
+                } else DynamicToast.makeError(activity!!.applicationContext, "Missing internet connection!", 2000).show();
                 return false
             }
 
@@ -136,4 +137,16 @@ class PlayingFragment : Fragment() {
             return fragment
         }
     }
+
+    val isNetworkAvailable: Boolean
+        get() = try {
+            val manager = activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            var networkInfo: NetworkInfo? = null
+            if (manager != null) {
+                networkInfo = manager.activeNetworkInfo
+            }
+            networkInfo != null && networkInfo.isConnected
+        } catch (e: NullPointerException) {
+            false
+        }
 }

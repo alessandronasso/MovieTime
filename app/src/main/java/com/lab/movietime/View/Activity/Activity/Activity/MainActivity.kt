@@ -23,9 +23,11 @@ import com.lab.movietime.Model.MovieResponse
 import com.lab.movietime.R
 import com.lab.movietime.View.Activity.Activity.Activity.MainActivity
 import com.lab.movietime.View.Activity.Activity.Fragment.HomeFragment
+import com.lab.movietime.View.Activity.Activity.Fragment.NetworkNotAvailable
 import com.lab.movietime.View.Activity.Activity.Fragment.PlayingFragment
 import com.lab.movietime.View.Activity.Activity.Fragment.PopularFragment
 import com.lab.movietime.values.Values
+import com.pranavpandey.android.dynamic.toasts.DynamicToast
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -36,6 +38,7 @@ class MainActivity : AppCompatActivity() {
     var homeFragment: HomeFragment? = null
     var popularFragment: PopularFragment? = null
     var playingFragment: PlayingFragment? = null
+    var networkFragment: NetworkNotAvailable? = NetworkNotAvailable()
     private fun loadFragment(fragment: Fragment) {
         val ft = supportFragmentManager.beginTransaction()
         ft.replace(R.id.fragment_container, fragment)
@@ -50,7 +53,8 @@ class MainActivity : AppCompatActivity() {
         if (homeFragment == null) {
             homeFragment = HomeFragment()
         }
-        loadFragment(homeFragment!!)
+        if (isNetworkAvailable) loadFragment(homeFragment!!)
+        else loadFragment(networkFragment!!)
         val navigation = findViewById<View>(R.id.BottomNavigation) as BottomNavigationView
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
     }
@@ -91,22 +95,31 @@ class MainActivity : AppCompatActivity() {
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
             R.id.bbn_item1 -> {
-                currentIndex = 0
-                if (homeFragment == null) homeFragment = HomeFragment()
-                loadFragment(homeFragment!!)
-                return@OnNavigationItemSelectedListener true
+                if (isNetworkAvailable) {
+                    currentIndex = 0
+                    if (homeFragment == null) homeFragment = HomeFragment()
+                    loadFragment(homeFragment!!)
+                    return@OnNavigationItemSelectedListener true
+                } else DynamicToast.makeError(this, "Missing internet connection!", 2000).show();
+                return@OnNavigationItemSelectedListener false
             }
             R.id.bbn_item2 -> {
-                currentIndex = 1
-                if (popularFragment == null) popularFragment = PopularFragment()
-                loadFragment(popularFragment!!)
-                return@OnNavigationItemSelectedListener true
+                if (isNetworkAvailable) {
+                    currentIndex = 1
+                    if (popularFragment == null) popularFragment = PopularFragment()
+                    loadFragment(popularFragment!!)
+                    return@OnNavigationItemSelectedListener true
+                } else DynamicToast.makeError(this, "Missing internet connection!", 2000).show();
+                return@OnNavigationItemSelectedListener false
             }
             R.id.bbn_item3 -> {
-                currentIndex = 2
-                if (playingFragment == null) playingFragment = PlayingFragment()
-                loadFragment(playingFragment!!)
-                return@OnNavigationItemSelectedListener true
+                if (isNetworkAvailable) {
+                    currentIndex = 2
+                    if (playingFragment == null) playingFragment = PlayingFragment()
+                    loadFragment(playingFragment!!)
+                    return@OnNavigationItemSelectedListener true
+                } else DynamicToast.makeError(this, "Missing internet connection!", 2000).show();
+                return@OnNavigationItemSelectedListener false
             }
         }
         false

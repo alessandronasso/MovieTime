@@ -85,4 +85,5 @@ dependencies {
     //Youtube player + chromecast sender
     implementation 'com.pierfrancescosoffritti.androidyoutubeplayer:core:10.0.5'
     implementation 'com.pierfrancescosoffritti.androidyoutubeplayer:chromecast-sender:0.23'
+    implementation 'com.pranavpandey.android:dynamic-toasts:3.2.0'
 }

@@ -1,13 +1,17 @@
 package com.lab.movietime.View.Activity.Activity.Fragment
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.os.Bundle
 import android.view.*
 import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.*
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -26,6 +30,7 @@ import com.lab.movietime.R
 import com.lab.movietime.View.Activity.Activity.Activity.DetailActivity
 import com.lab.movietime.values.Values
 import com.lab.movietime.values.Values.INVERSE_MAP
+import com.pranavpandey.android.dynamic.toasts.DynamicToast
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -109,7 +114,9 @@ class PopularFragment : Fragment() {
         }
 
         mSearchBtn!!.setOnClickListener {
-            searchMovie(mSearchField!!.text.toString())
+            if (isNetworkAvailable)
+                searchMovie(mSearchField!!.text.toString())
+            else DynamicToast.makeError(activity!!.applicationContext, "Missing internet connection!", 2000).show();
         }
 
         fab_open = AnimationUtils.loadAnimation(context, R.anim.fab_open);
@@ -248,22 +255,24 @@ class PopularFragment : Fragment() {
                     })
 
                     override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
-                        val child = rv.findChildViewUnder(e.x, e.y)
-                        if (child != null && gestureDetector.onTouchEvent(e)) {
-                            val position = rv.getChildAdapterPosition(child)
-                            val i = Intent(context, DetailActivity::class.java)
-                            i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                            i.putExtra(DetailActivity.EXTRA_ID, movies!![position]!!.id)
-                            i.putExtra(DetailActivity.EXTRA_TITLE, movies!![position]!!.title)
-                            i.putExtra(DetailActivity.EXTRA_OVERVIEW, movies!![position]!!.overview)
-                            i.putExtra(DetailActivity.EXTRA_TIME, movies!![position]!!.releaseDate)
-                            i.putExtra(DetailActivity.EXTRA_POSTER, movies!![position]!!.posterPath)
-                            i.putExtra(DetailActivity.EXTRA_LANGUAGE, movies!![position]!!.originalLanguage)
-                            i.putExtra(DetailActivity.EXTRA_GENRES, movies!![position]!!.genre)
-                            i.putExtra(DetailActivity.EXTRA_VOTE, movies!![position]!!.getVoteAverage())
-                            i.putExtra(DetailActivity.EXTRA_YTLINK, trailerMap[movies!![position]!!.id])
-                            context!!.startActivity(i)
-                        }
+                        if (isNetworkAvailable) {
+                            val child = rv.findChildViewUnder(e.x, e.y)
+                            if (child != null && gestureDetector.onTouchEvent(e)) {
+                                val position = rv.getChildAdapterPosition(child)
+                                val i = Intent(context, DetailActivity::class.java)
+                                i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                i.putExtra(DetailActivity.EXTRA_ID, movies!![position]!!.id)
+                                i.putExtra(DetailActivity.EXTRA_TITLE, movies!![position]!!.title)
+                                i.putExtra(DetailActivity.EXTRA_OVERVIEW, movies!![position]!!.overview)
+                                i.putExtra(DetailActivity.EXTRA_TIME, movies!![position]!!.releaseDate)
+                                i.putExtra(DetailActivity.EXTRA_POSTER, movies!![position]!!.posterPath)
+                                i.putExtra(DetailActivity.EXTRA_LANGUAGE, movies!![position]!!.originalLanguage)
+                                i.putExtra(DetailActivity.EXTRA_GENRES, movies!![position]!!.genre)
+                                i.putExtra(DetailActivity.EXTRA_VOTE, movies!![position]!!.getVoteAverage())
+                                i.putExtra(DetailActivity.EXTRA_YTLINK, trailerMap[movies!![position]!!.id])
+                                context!!.startActivity(i)
+                            }
+                        } else DynamicToast.makeError(activity!!.applicationContext, "Missing internet connection!", 2000).show();
                         return false
                     }
 
@@ -380,22 +389,24 @@ class PopularFragment : Fragment() {
             })
 
             override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
-                val child = rv.findChildViewUnder(e.x, e.y)
-                if (child != null && gestureDetector.onTouchEvent(e)) {
-                    val position = rv.getChildAdapterPosition(child)
-                    val i = Intent(context, DetailActivity::class.java)
-                    i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    i.putExtra(DetailActivity.EXTRA_ID, movies!![position]!!.id)
-                    i.putExtra(DetailActivity.EXTRA_TITLE, movies!![position]!!.title)
-                    i.putExtra(DetailActivity.EXTRA_OVERVIEW, movies!![position]!!.overview)
-                    i.putExtra(DetailActivity.EXTRA_TIME, movies!![position]!!.releaseDate)
-                    i.putExtra(DetailActivity.EXTRA_POSTER, movies!![position]!!.posterPath)
-                    i.putExtra(DetailActivity.EXTRA_LANGUAGE, movies!![position]!!.originalLanguage)
-                    i.putExtra(DetailActivity.EXTRA_GENRES, movies!![position]!!.genre)
-                    i.putExtra(DetailActivity.EXTRA_VOTE, movies!![position]!!.getVoteAverage())
-                    i.putExtra(DetailActivity.EXTRA_YTLINK, trailerMap[movies!![position]!!.id])
-                    context!!.startActivity(i)
-                }
+                if (isNetworkAvailable) {
+                    val child = rv.findChildViewUnder(e.x, e.y)
+                    if (child != null && gestureDetector.onTouchEvent(e)) {
+                        val position = rv.getChildAdapterPosition(child)
+                        val i = Intent(context, DetailActivity::class.java)
+                        i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        i.putExtra(DetailActivity.EXTRA_ID, movies!![position]!!.id)
+                        i.putExtra(DetailActivity.EXTRA_TITLE, movies!![position]!!.title)
+                        i.putExtra(DetailActivity.EXTRA_OVERVIEW, movies!![position]!!.overview)
+                        i.putExtra(DetailActivity.EXTRA_TIME, movies!![position]!!.releaseDate)
+                        i.putExtra(DetailActivity.EXTRA_POSTER, movies!![position]!!.posterPath)
+                        i.putExtra(DetailActivity.EXTRA_LANGUAGE, movies!![position]!!.originalLanguage)
+                        i.putExtra(DetailActivity.EXTRA_GENRES, movies!![position]!!.genre)
+                        i.putExtra(DetailActivity.EXTRA_VOTE, movies!![position]!!.getVoteAverage())
+                        i.putExtra(DetailActivity.EXTRA_YTLINK, trailerMap[movies!![position]!!.id])
+                        context!!.startActivity(i)
+                    }
+                } else DynamicToast.makeError(activity!!.applicationContext, "Missing internet connection!", 2000).show();
                 return false
             }
 
@@ -412,4 +423,16 @@ class PopularFragment : Fragment() {
             return fragment
         }
     }
+
+    val isNetworkAvailable: Boolean
+        get() = try {
+            val manager = activity!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            var networkInfo: NetworkInfo? = null
+            if (manager != null) {
+                networkInfo = manager.activeNetworkInfo
+            }
+            networkInfo != null && networkInfo.isConnected
+        } catch (e: NullPointerException) {
+            false
+        }
 }
