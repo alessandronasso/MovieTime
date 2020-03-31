@@ -1,26 +1,36 @@
 package com.lab.movietime.View.Activity.Activity.Activity
 
+import android.content.Context
+import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.os.Build
 import android.os.Bundle
+import android.view.GestureDetector
+import android.view.MotionEvent
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.GlideDrawable
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
+import com.lab.movietime.Adapter.PopularAdapter
 import com.lab.movietime.BuildConfig
 import com.lab.movietime.Interface.ApiBuilder.getClient
 import com.lab.movietime.Interface.ApiService
 import com.lab.movietime.Interface.DBHandler
 import com.lab.movietime.Listener.OnSwipeTouchListener
-import com.lab.movietime.Model.LanguageModel
+import com.lab.movietime.Model.*
 import com.lab.movietime.R
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
+import com.pranavpandey.android.dynamic.toasts.DynamicToast
 import kotlinx.android.synthetic.main.detail_activity.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -32,6 +42,13 @@ import java.util.*
 class DetailActivity : AppCompatActivity() {
     private var currentApiVersion = 0
     private val mapLang = HashMap<String, String?>()
+    private var movies: List<MovieModel?>? = ArrayList()
+    private val trailerMap = HashMap<Int, String?>()
+    val apiService = getClient(this@DetailActivity)!!.create(ApiService::class.java)
+
+    @JvmField
+    @BindView(R.id.rcRelated_view)
+    var recyclerView: RecyclerView? = null
 
     @JvmField
     @BindView(R.id.movieTitle)
@@ -172,6 +189,65 @@ class DetailActivity : AppCompatActivity() {
 
             override fun onFailure(call: Call<List<LanguageModel?>?>, t: Throwable) {}
         })
+
+        //RELATED MOVES
+        recyclerView = findViewById(R.id.rcRelated_view)
+        recyclerView!!.layoutManager = LinearLayoutManager(this@DetailActivity, LinearLayoutManager.HORIZONTAL, false)
+        val callRelated = apiService.getItemSearch((intent.getStringExtra(EXTRA_TITLE)+" ").split(" ")[0])
+        callRelated!!.enqueue(object : Callback<MovieResponse?> {
+            override fun onResponse(call: Call<MovieResponse?>, response: Response<MovieResponse?>) {
+                movies = response.body()!!.results
+                removeAlreadySelectedMovie()
+                for (i in movies!!.indices) {
+                    val callT = apiService.getMovieTrailer(movies!![i]!!.id, BuildConfig.API_KEY)
+                    callT!!.enqueue(object : Callback<MovieTrailerResponse?> {
+                        override fun onResponse(call2: Call<MovieTrailerResponse?>, response2: Response<MovieTrailerResponse?>) {
+                            val mt: List<MovieTrailer>? = response2.body()!!.results
+                            val mtID = response2.body()!!.id
+                            if (mt!!.isEmpty()) trailerMap[mtID] = "S0Q4gqBUs7c" else trailerMap[mtID] = mt[0].key
+                        }
+
+                        override fun onFailure(call2: Call<MovieTrailerResponse?>, t: Throwable) {}
+                    })
+                }
+                recyclerView!!.adapter = PopularAdapter(movies as List<MovieModel>, R.layout.content_main, this@DetailActivity)
+                recyclerView!!.addOnItemTouchListener(object : RecyclerView.OnItemTouchListener {
+                    var gestureDetector = GestureDetector(this@DetailActivity, object : GestureDetector.SimpleOnGestureListener() {
+                        override fun onSingleTapUp(e: MotionEvent): Boolean {
+                            return true
+                        }
+                    })
+
+                    override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
+                        if (isNetworkAvailable) {
+                            val child = rv.findChildViewUnder(e.x, e.y)
+                            if (child != null && gestureDetector.onTouchEvent(e)) {
+                                val position = rv.getChildAdapterPosition(child)
+                                val i = Intent(this@DetailActivity, DetailActivity::class.java)
+                                i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                i.putExtra(DetailActivity.EXTRA_ID, movies!![position]!!.id)
+                                i.putExtra(DetailActivity.EXTRA_TITLE, movies!![position]!!.title)
+                                i.putExtra(DetailActivity.EXTRA_OVERVIEW, movies!![position]!!.overview)
+                                i.putExtra(DetailActivity.EXTRA_TIME, movies!![position]!!.releaseDate)
+                                i.putExtra(DetailActivity.EXTRA_POSTER, movies!![position]!!.posterPath)
+                                i.putExtra(DetailActivity.EXTRA_LANGUAGE, movies!![position]!!.originalLanguage)
+                                i.putExtra(DetailActivity.EXTRA_GENRES, movies!![position]!!.genre)
+                                i.putExtra(DetailActivity.EXTRA_VOTE, movies!![position]!!.getVoteAverage())
+                                i.putExtra(DetailActivity.EXTRA_YTLINK, trailerMap[movies!![position]!!.id])
+                                this@DetailActivity.startActivity(i)
+                            }
+                        } else DynamicToast.makeError(this@DetailActivity, "Missing internet connection!", 2000).show();
+                        return false
+                    }
+
+                    override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {}
+                    override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {}
+                })
+            }
+
+            override fun onFailure(call: Call<MovieResponse?>, t: Throwable) {}
+        })
+
     }
 
     private fun hideNavigationBar() {
@@ -200,8 +276,17 @@ class DetailActivity : AppCompatActivity() {
         ratingBar!!.rating = vote.toFloat()
     }
 
+    private fun removeAlreadySelectedMovie() {
+        var selectedSeries: MutableList<MovieModel?>? = ArrayList()
+        for (i in movies!!.indices) {
+            if (!(movies!!.get(i)!!.id == intent.getIntExtra(EXTRA_ID, 0)))
+                selectedSeries!!.add(movies!!.get(i))
+        }
+        movies = null
+        movies = selectedSeries as List<MovieModel?>
+    }
+
     private fun initializeMapLang() {
-        val apiService = getClient(this@DetailActivity)!!.create(ApiService::class.java)
         val call = apiService.getLanguages(BuildConfig.API_KEY)
         call!!.enqueue(object : Callback<List<LanguageModel?>?> {
             override fun onResponse(call: Call<List<LanguageModel?>?>, response: Response<List<LanguageModel?>?>) {
@@ -212,6 +297,18 @@ class DetailActivity : AppCompatActivity() {
             override fun onFailure(call: Call<List<LanguageModel?>?>, t: Throwable) {}
         })
     }
+
+    val isNetworkAvailable: Boolean
+        get() = try {
+            val manager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            var networkInfo: NetworkInfo? = null
+            if (manager != null) {
+                networkInfo = manager.activeNetworkInfo
+            }
+            networkInfo != null && networkInfo.isConnected
+        } catch (e: NullPointerException) {
+            false
+        }
 
     companion object {
         var EXTRA_ID = "extra_id"

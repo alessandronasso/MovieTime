@@ -208,7 +208,35 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:layout_marginLeft="8dp"
-                tools:text="Twenty-two years after the events of Jurassic Park, Isla Nublar now features a fully functioning dinosaur theme park, Jurassic World, as originally envisioned by John Hammond. Twenty-two years after the events of Jurassic Park, Isla Nublar now features a fully functioning dinosaur theme park, Jurassic World, as originally envisioned by John Hammond. Twenty-two years after the events of Jurassic Park, Isla Nublar now features a fully functioning dinosaur theme park, Jurassic World, as originally envisioned by John Hammond."/>
+                tools:text="Twenty-two years."/>
+
+            <TextView
+                android:layout_marginTop="16dp"
+                android:id="@+id/relatedHeader"
+                android:layout_below="@id/overviewTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:textColor="#ffffff"
+                android:text="Movies related"
+                android:layout_centerHorizontal="true"
+                android:gravity="center"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+                android:textStyle="bold"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/relatedHeader"
+                android:minHeight="@dimen/_150sdp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:orientation="vertical">
+                <androidx.recyclerview.widget.RecyclerView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:id="@+id/rcRelated_view"/>
+            </LinearLayout>
 
             <ProgressBar
                 android:id="@+id/progressBar"
