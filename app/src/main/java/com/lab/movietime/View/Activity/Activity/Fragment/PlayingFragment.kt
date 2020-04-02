@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.util.Pair
 import android.view.*
 import android.view.GestureDetector.SimpleOnGestureListener
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -34,7 +35,13 @@ class PlayingFragment : Fragment() {
     @JvmField
     @BindView(R.id.rc_view)
     var recyclerView: RecyclerView? = null
+
+    @JvmField
+    @BindView(R.id.tv_no_data)
+    var tvNoData: TextView? = null
+
     private var movies: MutableList<MovieModel> = ArrayList()
+
     private val trailerMap = HashMap<Int, String?>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,11 +54,14 @@ class PlayingFragment : Fragment() {
                     .replace(R.id.fragment_container, PlayingFragment())
                     .commit()
         }
+        if ((movies as List<MovieModel>).size==0) tvNoData!!.setVisibility(View.VISIBLE);
+        else tvNoData!!.setVisibility(View.INVISIBLE)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.playing_fragment, container, false)
         recyclerView = view.findViewById(R.id.playing_rc_view)
+        tvNoData = view.findViewById(R.id.tv_no_data)
         movies = ArrayList()
         loadMovie()
         return view
@@ -63,7 +73,6 @@ class PlayingFragment : Fragment() {
         val db = DBHandler(context!!)
         db.open()
         val c = db.movies
-        val listExtracted: List<Pair<String, String>> = ArrayList()
         if (c.moveToFirst()) {
             do {
                 val itemToSearch = c.getString(1)
@@ -88,6 +97,8 @@ class PlayingFragment : Fragment() {
                             })
                         }
                         recyclerView!!.adapter = PopularAdapter(movies, R.layout.content_main, context!!)
+                        if ((movies as List<MovieModel>).size==0) tvNoData!!.setVisibility(View.VISIBLE);
+                        else tvNoData!!.setVisibility(View.INVISIBLE)
                     }
 
                     override fun onFailure(call: Call<MovieResponse?>, t: Throwable) {}

@@ -19,6 +19,17 @@
         android:minHeight="@dimen/_150sdp"
         android:layout_marginTop="@dimen/_10sdp"
         android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_no_data"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="No movies found in your watchlist!"
+            android:textColor="@color/colorPrimary"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:visibility="invisible" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

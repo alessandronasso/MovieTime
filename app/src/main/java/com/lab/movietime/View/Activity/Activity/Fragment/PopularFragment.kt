@@ -91,10 +91,15 @@ class PopularFragment : Fragment() {
     @BindView(R.id.releaseYear)
     var releaseYear: EditText? = null
 
+    @JvmField
+    @BindView(R.id.tv_no_data)
+    var tvNoData: TextView? = null
+
     lateinit var fab_open: Animation
     lateinit var fab_close: Animation
     lateinit var rotate_forward: Animation
     lateinit var rotate_backward: Animation
+    var noMoviesAvailable: Boolean = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.popular_fragment, container, false)
@@ -125,6 +130,7 @@ class PopularFragment : Fragment() {
         rotate_backward = AnimationUtils.loadAnimation(context,R.anim.rotate_backward);
 
 
+        tvNoData = view.findViewById(R.id.tv_no_data)
         fab = view.findViewById(R.id.fab)
         fabitem1 = view.findViewById(R.id.fab1)
         fabitem2 = view.findViewById(R.id.fab2)
@@ -149,7 +155,9 @@ class PopularFragment : Fragment() {
             closeAnimation()
         }
 
-        if (movies!!.isEmpty()) loadMovie() else refreshList()
+        if (!noMoviesAvailable)
+            if (movies!!.isEmpty()) loadMovie() else refreshList()
+        else tvNoData!!.setVisibility(View.VISIBLE)
         return view
     }
 
@@ -345,6 +353,13 @@ class PopularFragment : Fragment() {
 
                     recyclerView!!.adapter = PopularAdapter(movies as List<MovieModel>, R.layout.content_main, context!!)
                     recyclerView!!.adapter!!.notifyDataSetChanged()
+                    if ((movies as List<MovieModel>).size==0) {
+                        noMoviesAvailable = true
+                        tvNoData!!.setVisibility(View.VISIBLE)
+                    } else {
+                        noMoviesAvailable = false
+                        tvNoData!!.setVisibility(View.INVISIBLE)
+                    }
                 }
 
                 override fun onFailure(call: Call<MovieResponse?>, t: Throwable) {}
@@ -419,6 +434,8 @@ class PopularFragment : Fragment() {
             override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {}
             override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {}
         })
+        if ((movies as List<MovieModel>).size==0) tvNoData!!.setVisibility(View.VISIBLE);
+        else tvNoData!!.setVisibility(View.INVISIBLE);
     }
 
     companion object {
