@@ -3,6 +3,8 @@ apply plugin: 'com.jakewharton.butterknife'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: "kotlin-kapt"
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.firebase-perf'
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
@@ -45,13 +47,13 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+    implementation 'com.google.firebase:firebase-perf:19.0.7'
 
     //AutoLayout
     implementation 'com.intuit.sdp:sdp-android:1.0.6'
     implementation 'com.intuit.ssp:ssp-android:1.0.6'
 
     implementation 'com.jcodecraeer:xrecyclerview:1.6.0'
-    implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'com.squareup.retrofit2:retrofit:2.5.0'
 
     implementation 'com.jcodecraeer:xrecyclerview:1.6.0'

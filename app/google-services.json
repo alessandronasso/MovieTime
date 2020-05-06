@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "411528537129",
+    "firebase_url": "https://movietime-1f20f.firebaseio.com",
+    "project_id": "movietime-1f20f",
+    "storage_bucket": "movietime-1f20f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:411528537129:android:8dd595cbc7ba1af34ae838",
+        "android_client_info": {
+          "package_name": "com.lab.movietime"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "411528537129-j1hsm2114sggjmli24shu7kvsh62sb7f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBPuLeWIo8XUT5ntGn7iBcnr0XwDnZwU6M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "411528537129-j1hsm2114sggjmli24shu7kvsh62sb7f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

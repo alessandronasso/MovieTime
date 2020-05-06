@@ -11,7 +11,6 @@ import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.*
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -31,16 +30,17 @@ import com.lab.movietime.View.Activity.Activity.Activity.DetailActivity
 import com.lab.movietime.values.Values
 import com.lab.movietime.values.Values.INVERSE_MAP
 import com.pranavpandey.android.dynamic.toasts.DynamicToast
+import kotlinx.android.synthetic.main.popular_fragment.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.File
 import java.lang.Integer.parseInt
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlin.collections.ArrayList
 
 class PopularFragment : Fragment() {
-    private var mSearchField: EditText? = null
+    private var mSearchField: AutoCompleteTextView? = null
     private var mSearchBtn: ImageButton? = null
     private val trailerMap = HashMap<Int, String?>()
     private var movies: List<MovieModel?>? = ArrayList()
@@ -104,7 +104,7 @@ class PopularFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.popular_fragment, container, false)
         recyclerView = view.findViewById(R.id.popular_rc_view) as RecyclerView
-        mSearchField = view.findViewById<View>(R.id.search_field) as EditText
+        mSearchField = view.findViewById<View>(R.id.search_field) as AutoCompleteTextView
         mSearchBtn = view.findViewById<View>(R.id.search_btn) as ImageButton
         checkbox = view.findViewById(R.id.checkbox_adv) as CheckBox
         hiddenTab = view.findViewById(R.id.hiddenTab) as LinearLayout
@@ -112,6 +112,12 @@ class PopularFragment : Fragment() {
         spinnerVote = view.findViewById(R.id.spinnerVote) as Spinner
         spinnerOperator = view.findViewById(R.id.spinnerOperator) as Spinner
         releaseYear = view.findViewById(R.id.releaseYear) as EditText
+
+        val history: Array<out String> = resources.getStringArray(R.array.film_list)
+
+        val adapter: ArrayAdapter<String> = ArrayAdapter<String>(this!!.context!!, android.R.layout.select_dialog_item, history!!)
+        mSearchField!!.threshold = 1 //will start working from first character
+        mSearchField!!.setAdapter(adapter)
 
         checkbox!!.setOnCheckedChangeListener { buttonView, isChecked ->
             if (isChecked) hiddenTab!!.visibility = View.VISIBLE
@@ -157,7 +163,7 @@ class PopularFragment : Fragment() {
 
         if (!noMoviesAvailable)
             if (movies!!.isEmpty()) loadMovie() else refreshList()
-        else tvNoData!!.setVisibility(View.VISIBLE)
+        else tvNoData!!.visibility = View.VISIBLE
         return view
     }
 
@@ -324,11 +330,12 @@ class PopularFragment : Fragment() {
                         val callT = apiService.getMovieTrailer(movies!![i]!!.id, BuildConfig.API_KEY)
                         callT!!.enqueue(object : Callback<MovieTrailerResponse?> {
                             override fun onResponse(call2: Call<MovieTrailerResponse?>, response2: Response<MovieTrailerResponse?>) {
-                                val mt: List<MovieTrailer>? = response2.body()!!.results
-                                val mtID = response2.body()!!.id
-                                if (mt!!.isEmpty()) trailerMap[mtID] = "S0Q4gqBUs7c" else trailerMap[mtID] = mt[0].key
+                                if (response2.body()?.results != null) {
+                                    val mt: List<MovieTrailer>? = response2.body()!!.results
+                                    val mtID = response2.body()!!.id
+                                    if (mt!!.isEmpty()) trailerMap[mtID] = "S0Q4gqBUs7c" else trailerMap[mtID] = mt[0].key
+                                }
                             }
-
                             override fun onFailure(call2: Call<MovieTrailerResponse?>, t: Throwable) {}
                         })
                     }
