@@ -128,6 +128,7 @@ class PlayingFragment : Fragment() {
                         i.putExtra(DetailActivity.EXTRA_GENRES, movies[position].genre)
                         i.putExtra(DetailActivity.EXTRA_VOTE, movies[position].getVoteAverage())
                         i.putExtra(DetailActivity.EXTRA_YTLINK, trailerMap[movies[position].id])
+                        i.putExtra(DetailActivity.EXTRA_RUNTIME, movies!![position]!!.runtime)
                         context!!.startActivity(i)
                     }
                 } else DynamicToast.makeError(activity!!.applicationContext, "Missing internet connection!", 2000).show();

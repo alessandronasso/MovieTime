@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:ndroid="http://schemas.android.com/apk/res-auto"
     android:background="#1f1f1f"
     android:id="@+id/detail_activity"
     tools:context="com.lab.movietime.View.Activity.Activity.Activity.DetailActivity">
@@ -128,9 +128,9 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/container"
+            android:layout_below="@id/container">
 
-            >
+            <!-- BLOCK 1 -->
 
             <TextView
                 android:layout_marginTop="16dp"
@@ -153,18 +153,48 @@
                 android:layout_marginBottom="8dp"
                 tools:text="ff"/>
 
+            <!-- BLOCK 2 -->
+
             <TextView
-                android:layout_marginTop="16dp"
-                android:layout_marginRight="16dp"
-                android:id="@+id/countryHeader"
-                android:layout_alignParentEnd="true"
+                android:id="@+id/runtimeHeader"
                 android:layout_width="wrap_content"
+                android:gravity="center_horizontal"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:layout_toStartOf="@id/countryHeader"
+                android:layout_toEndOf="@id/releaseDateHeader"
+                android:text="Length"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+                android:textColor="#ffffff"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_below="@id/runtimeHeader"
+                android:id="@+id/runtimeTextView"
+                android:gravity="center_horizontal"
+                android:layout_width="wrap_content"
+                android:ellipsize="end"
+                android:textColor="#ffffff"
+                android:layout_toEndOf="@id/releaseDateHeader"
+                android:layout_toStartOf="@id/countryHeader"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:textColor="#ffffff"
+                tools:text="ff"/>
+
+            <!-- BLOCK 3 -->
+
+            <TextView
+                android:id="@+id/countryHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
                 android:text="Language"
                 android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
-                android:textStyle="bold"/>
+                android:textColor="#ffffff"
+                android:textStyle="bold" />
 
             <TextView
                 android:layout_below="@id/countryHeader"

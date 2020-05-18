@@ -6,7 +6,7 @@ import java.util.*
 
 class MovieModel(@field:SerializedName("poster_path") var posterPath: String, @field:SerializedName("adult") var isAdult: Boolean, @field:SerializedName("overview") var overview: String, @field:SerializedName("release_date") var releaseDate: String, genreIds: List<Int>, id: Int,
                  originalTitle: String, originalLanguage: String, title: String, backdropPath: String, popularity: Double,
-                 voteCount: Int, video: Boolean, voteAverage: Double) {
+                 voteCount: Int, video: Boolean, voteAverage: Double, runtime: Int) {
 
     @SerializedName("genre_ids")
     var genreIds: List<Int> = ArrayList()
@@ -35,10 +35,14 @@ class MovieModel(@field:SerializedName("poster_path") var posterPath: String, @f
     @SerializedName("video")
     var video: Boolean
 
+    @SerializedName("runtime")
+    var runtime: Int
+
     @SerializedName("vote_average")
     private var voteAverage: Double
 
     var linkTrailer: String? = null
+
     fun getVoteAverage(): Double {
         return voteAverage / 2
     }
@@ -51,7 +55,7 @@ class MovieModel(@field:SerializedName("poster_path") var posterPath: String, @f
         get() {
             var tmp = ""
             for (i in genreIds.indices) tmp += Values.MAP_NAME[genreIds[i]].toString() + ", "
-            return if (tmp == "") "Unknow" else tmp.substring(0, tmp.length - 2)
+            return if (tmp == "") "Unknown" else tmp.substring(0, tmp.length - 2)
         }
 
     init {
@@ -65,5 +69,6 @@ class MovieModel(@field:SerializedName("poster_path") var posterPath: String, @f
         this.voteCount = voteCount
         this.video = video
         this.voteAverage = voteAverage
+        this.runtime = runtime
     }
 }

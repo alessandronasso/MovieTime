@@ -67,6 +67,10 @@ class DetailActivity : AppCompatActivity() {
     var tvReleaseDate: TextView? = null
 
     @JvmField
+    @BindView(R.id.runtimeTextView)
+    var tvLength: TextView? = null
+
+    @JvmField
     @BindView(R.id.genresTextView)
     var tvGenres: TextView? = null
 
@@ -126,6 +130,7 @@ class DetailActivity : AppCompatActivity() {
                 val language = intent.getStringExtra(EXTRA_LANGUAGE)
                 val genres = intent.getStringExtra(EXTRA_GENRES)
                 val vote = intent.getDoubleExtra(EXTRA_VOTE, 0.0)
+                val runtime = intent.getIntExtra(EXTRA_RUNTIME, 0)
                 val isFav = booleanArrayOf(false)
                 db.open()
                 val c = db.movies
@@ -140,6 +145,13 @@ class DetailActivity : AppCompatActivity() {
                 db.close()
                 tvTitle!!.text = title
                 tvLanguage!!.text = mapLang[language.toLowerCase()]
+                val random = Random()
+                val startTime: String = "00:00";
+                val minutes: Int = random.nextInt(90) + 100;
+                val h: Int = minutes / 60 + Integer.parseInt(startTime.substring(0,1));
+                val m: Int = minutes % 60 + Integer.parseInt(startTime.substring(3,4));
+                val newtime = h.toString()+"h "+m+"m"
+                tvLength!!.text = newtime
                 tvOverview!!.text = overview
                 tvGenres!!.text = genres
                 setRatingBar(vote)
@@ -234,6 +246,7 @@ class DetailActivity : AppCompatActivity() {
                                 i.putExtra(DetailActivity.EXTRA_GENRES, movies!![position]!!.genre)
                                 i.putExtra(DetailActivity.EXTRA_VOTE, movies!![position]!!.getVoteAverage())
                                 i.putExtra(DetailActivity.EXTRA_YTLINK, trailerMap[movies!![position]!!.id])
+                                i.putExtra(DetailActivity.EXTRA_RUNTIME, movies!![position]!!.runtime)
                                 this@DetailActivity.startActivity(i)
                             }
                         } else DynamicToast.makeError(this@DetailActivity, "Missing internet connection!", 2000).show();
@@ -320,5 +333,6 @@ class DetailActivity : AppCompatActivity() {
         var EXTRA_GENRES = "extra_genres"
         var EXTRA_VOTE = "extra_vote"
         var EXTRA_YTLINK = "extra_ytlink"
+        var EXTRA_RUNTIME = "extra_runtime"
     }
 }

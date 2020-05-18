@@ -180,9 +180,11 @@ class PopularFragment : Fragment() {
     private fun removeYear(year: Int) {
         var selectedSeries: MutableList<MovieModel?>? = ArrayList()
         for (i in movies!!.indices) {
-            var s = movies!!.get(i)!!.releaseDate.substring(0,4)
-            if (s.toInt()==year)
-                selectedSeries!!.add(movies!!.get(i))
+            if (movies!!.get(i)!!.releaseDate.length!=0) {
+                var s = movies!!.get(i)!!.releaseDate.substring(0, 4)
+                if (s.toInt() == year)
+                    selectedSeries!!.add(movies!!.get(i))
+            }
         }
         movies = null
         movies = selectedSeries as List<MovieModel?>
@@ -284,6 +286,7 @@ class PopularFragment : Fragment() {
                                 i.putExtra(DetailActivity.EXTRA_GENRES, movies!![position]!!.genre)
                                 i.putExtra(DetailActivity.EXTRA_VOTE, movies!![position]!!.getVoteAverage())
                                 i.putExtra(DetailActivity.EXTRA_YTLINK, trailerMap[movies!![position]!!.id])
+                                i.putExtra(DetailActivity.EXTRA_RUNTIME, movies!![position]!!.runtime)
                                 context!!.startActivity(i)
                             }
                         } else DynamicToast.makeError(activity!!.applicationContext, "Missing internet connection!", 2000).show();

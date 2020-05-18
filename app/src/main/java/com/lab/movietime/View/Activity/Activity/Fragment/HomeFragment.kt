@@ -90,6 +90,7 @@ class HomeFragment : Fragment() {
                     movies = removeEmptyMovies(movies)
                     for (i in movies!!.indices) {
                         val callT = apiService.getMovieTrailer(movies[i].id, BuildConfig.API_KEY)
+                        System.out.println("PROVA: "+movies[i].runtime+" ID: "+movies[i].title)
                         callT!!.enqueue(object : Callback<MovieTrailerResponse?> {
                             override fun onResponse(call2: Call<MovieTrailerResponse?>, response2: Response<MovieTrailerResponse?>) {
                                 val mt: List<MovieTrailer>? = response2.body()!!.results
@@ -124,6 +125,7 @@ class HomeFragment : Fragment() {
                                     i.putExtra(DetailActivity.EXTRA_GENRES, movies[position].genre)
                                     i.putExtra(DetailActivity.EXTRA_VOTE, movies[position].getVoteAverage())
                                     i.putExtra(DetailActivity.EXTRA_YTLINK, trailerMap[movies[position].id])
+                                    i.putExtra(DetailActivity.EXTRA_RUNTIME, movies!![position]!!.runtime)
                                     context!!.startActivity(i)
                                 }
                             } else DynamicToast.makeError(activity!!.applicationContext, "Missing internet connection!", 2000).show();
@@ -205,6 +207,7 @@ class HomeFragment : Fragment() {
                             i.putExtra(DetailActivity.EXTRA_GENRES, movieList[j]!![position].genre)
                             i.putExtra(DetailActivity.EXTRA_VOTE, movieList[j]!![position].getVoteAverage())
                             i.putExtra(DetailActivity.EXTRA_YTLINK, trailerMap[movieList[j]!![position].id])
+                            i.putExtra(DetailActivity.EXTRA_RUNTIME, movieList[j]!![position].runtime)
                             context!!.startActivity(i)
                         }
                     } else DynamicToast.makeError(activity!!.applicationContext, "Missing internet connection!", 2000).show();
