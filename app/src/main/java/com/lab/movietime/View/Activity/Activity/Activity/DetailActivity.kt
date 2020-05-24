@@ -27,6 +27,7 @@ import com.lab.movietime.Interface.DBHandler
 import com.lab.movietime.Listener.OnSwipeTouchListener
 import com.lab.movietime.Model.*
 import com.lab.movietime.R
+import com.lab.movietime.values.Values
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
@@ -55,12 +56,24 @@ class DetailActivity : AppCompatActivity() {
     var tvTitle: TextView? = null
 
     @JvmField
+    @BindView(R.id.hiddenTab2)
+    var hiddenTab: LinearLayout? = null
+
+    @JvmField
     @BindView(R.id.overviewTextView)
     var tvOverview: TextView? = null
 
     @JvmField
     @BindView(R.id.countryTextView)
     var tvLanguage: TextView? = null
+
+    @JvmField
+    @BindView(R.id.textQuestion)
+    var tvTextQuestion: TextView? = null
+
+    @JvmField
+    @BindView(R.id.spinnerQuestion)
+    var tvSpinner: Spinner? = null
 
     @JvmField
     @BindView(R.id.releaseDateTextView)
@@ -83,6 +96,10 @@ class DetailActivity : AppCompatActivity() {
     var btnFav: Button? = null
 
     @JvmField
+    @BindView(R.id.favButton2)
+    var btnFav2: Button? = null
+
+    @JvmField
     @BindView(R.id.progressBar)
     var progressBar: ProgressBar? = null
 
@@ -93,6 +110,10 @@ class DetailActivity : AppCompatActivity() {
     @JvmField
     @BindView(R.id.youtube_player_view)
     var youTubePlayerView: YouTubePlayerView? = null
+
+    @JvmField
+    @BindView(R.id.checkbox_adv2)
+    var checkbox: CheckBox? = null
 
     var db = DBHandler(this)
 
@@ -168,8 +189,55 @@ class DetailActivity : AppCompatActivity() {
                     val formatter = SimpleDateFormat("dd MMM yyyy")
                     val formattedDate = formatter.format(date)
                     tvReleaseDate!!.text = formattedDate
-                } catch (e: ParseException) {
-                    e.printStackTrace()
+                } catch (e: ParseException) { e.printStackTrace() }
+
+                checkbox!!.setOnCheckedChangeListener { buttonView, isChecked ->
+                    if (isChecked) hiddenTab!!.visibility = View.VISIBLE
+                    else hiddenTab!!.visibility = View.GONE
+                }
+                checkbox!!.setOnCheckedChangeListener { buttonView, isChecked ->
+                    if (isChecked) hiddenTab!!.visibility = View.VISIBLE
+                    else hiddenTab!!.visibility = View.GONE
+                }
+                //setting the question
+                val question: Int = random.nextInt(3) + 0;
+                val spinnerArray = arrayOfNulls<String>(4)
+                when (question) {
+                    0 -> {
+                        tvTextQuestion!!.text = Values.QUESTION[question]+title+"?"
+                        val calendar = Calendar.getInstance()
+                        calendar.time = date
+                        spinnerArray[0] = calendar.get(Calendar.YEAR).toString()
+                        spinnerArray[1] = (random.nextInt(1900) + 100).toString();
+                        spinnerArray[2] = (random.nextInt(1900) + 100).toString();
+                        spinnerArray[3] = (random.nextInt(1900) + 100).toString();
+                    }
+                    1 -> {
+                        tvTextQuestion!!.text = Values.QUESTION[question]+title+"?"
+                        spinnerArray[2] = mapLang[language.toLowerCase()]
+                        spinnerArray[1] = "Russian"
+                        spinnerArray[0] = "Turkish"
+                        spinnerArray[3] = "Polkish"
+                    }
+                    else -> {
+                        tvTextQuestion!!.text = Values.QUESTION[question]+title+"?"
+                        spinnerArray[0] = "1"
+                        spinnerArray[1] = "4"
+                        spinnerArray[2] = "3"
+                        spinnerArray[3] = "2"
+                    }
+                }
+                val adapter = ArrayAdapter(this@DetailActivity,android.R.layout.simple_spinner_item,spinnerArray)
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                spinnerQuestion.adapter = adapter
+                //
+                btnFav2!!.setOnClickListener {
+                    if (question == 0 && spinnerQuestion.getSelectedItemPosition()==0 ||
+                            question == 1 && spinnerQuestion.getSelectedItemPosition()== 2 ||
+                            question == 2 && spinnerQuestion.getSelectedItemPosition()==3)
+                        Toast.makeText(this@DetailActivity, "Correct!", Toast.LENGTH_SHORT).show()
+                    else Toast.makeText(this@DetailActivity, "Wrong!", Toast.LENGTH_SHORT).show()
+
                 }
                 Glide.with(this@DetailActivity).load(BuildConfig.URL_POSTER + poster)
                         .listener(object : RequestListener<String?, GlideDrawable?> {

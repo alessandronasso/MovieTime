@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:ndroid="http://schemas.android.com/apk/res-auto"
     android:background="#1f1f1f"
     android:id="@+id/detail_activity"
     tools:context="com.lab.movietime.View.Activity.Activity.Activity.DetailActivity">
@@ -240,10 +239,88 @@
                 android:layout_marginLeft="8dp"
                 tools:text="Twenty-two years."/>
 
+            <CheckBox
+                android:id="@+id/checkbox_adv2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Let's play!"
+                android:layout_marginEnd="@dimen/_30sdp"
+                android:textColor="@color/colorPrimary"
+                android:layout_below="@id/overviewTextView"/>
+
+            <LinearLayout
+                android:background="@layout/rounded_border_linearlayout"
+                android:id="@+id/hiddenTab2"
+                android:paddingTop="@dimen/_10sdp"
+                android:paddingBottom="@dimen/_10sdp"
+                android:paddingRight="@dimen/_10sdp"
+                android:paddingLeft="@dimen/_10sdp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:layout_marginTop="@dimen/_7sdp"
+                android:layout_below="@+id/checkbox_adv2"
+                tools:visibility="visible">
+
+                <!-- LINE 1 -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/textQuestion"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="Genre:"
+                        android:textSize="18dp"
+                        android:textColor="@color/colorPrimary"
+                        android:textAlignment="gravity" />
+
+                </LinearLayout>
+
+                <!-- END OF LINE 1 -->
+
+                <!-- LINE 2 -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center">
+
+                    <Spinner
+                        android:id="@+id/spinnerQuestion"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/spinner_background"
+                        android:layout_margin="10dp"
+                        android:textColor="@color/colorPrimary" />
+
+                </LinearLayout>
+
+                <!-- END OF LINE 2 -->
+
+                <!-- LINE 3 -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right">
+
+                    <Button
+                        android:id="@+id/favButton2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="#ffffff"
+                        android:text="Ok!"/>
+                    <!-- END OF LINE 3 -->
+                </LinearLayout>
+            </LinearLayout>
+
             <TextView
                 android:layout_marginTop="16dp"
                 android:id="@+id/relatedHeader"
-                android:layout_below="@id/overviewTextView"
+                android:layout_below="@id/hiddenTab2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"

@@ -12,6 +12,7 @@ object Values {
     var GENRE = intArrayOf(28, 12, 16, 35, 80, 99, 18, 10751, 14, 36, 27, 10402, 9648, 10749, 878, 10770, 53, 10752, 37)
     var GENRE_BY_NAME = arrayOf("Action", "Adventure", "Animation", "Comedy", "Crime", "Documentary", "Drama",
             "Family", "Fantasy", "History", "Horror", "Music", "Mystery", "Romance", "Science Fiction", "TV Movie", "Thriller", "War", "Western")
+    var QUESTION = arrayOf("What is the release year of ", "What is the original language of ", "How many sequels have been produced after ")
     @JvmField
     var ADULT = false
     @JvmField

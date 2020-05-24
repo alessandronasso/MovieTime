@@ -75,10 +75,10 @@ class HomeFragment : Fragment() {
         val apiService = getClient(context)!!.create(ApiService::class.java)
         randomGenre = ArrayList()
         for (j in 0 until NUM_ROWS) {
-            var rand_tmp = rand.nextInt(GENRE.size)
-            while (randomGenre.contains(rand_tmp)) rand_tmp = rand.nextInt(GENRE.size)
-            randomGenre.add(rand_tmp)
-            genre[j]?.text = MAP_NAME.get(GENRE.get(rand_tmp))
+            var byRelevance = rand.nextInt(GENRE.size)
+            while (randomGenre.contains(byRelevance)) byRelevance = rand.nextInt(GENRE.size)
+            randomGenre.add(byRelevance)
+            genre[j]?.text = MAP_NAME.get(GENRE.get(byRelevance))
             recyclerView[j]!!.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             call[j] = apiService.getDiscover(BuildConfig.API_KEY, Values.LANGUAGE, Values.SORT_BY[0], Values.ADULT, GENRE.get(randomGenre[j]), Values.PAGE[rand.nextInt(5)])
         }
@@ -90,7 +90,6 @@ class HomeFragment : Fragment() {
                     movies = removeEmptyMovies(movies)
                     for (i in movies!!.indices) {
                         val callT = apiService.getMovieTrailer(movies[i].id, BuildConfig.API_KEY)
-                        System.out.println("PROVA: "+movies[i].runtime+" ID: "+movies[i].title)
                         callT!!.enqueue(object : Callback<MovieTrailerResponse?> {
                             override fun onResponse(call2: Call<MovieTrailerResponse?>, response2: Response<MovieTrailerResponse?>) {
                                 val mt: List<MovieTrailer>? = response2.body()!!.results
